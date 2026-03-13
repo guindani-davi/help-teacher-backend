@@ -1,0 +1,13 @@
+ALTER TABLE organizations_users RENAME TO memberships;
+
+ALTER TABLE memberships RENAME CONSTRAINT organizations_users_user_id_fkey TO memberships_user_id_fkey;
+ALTER TABLE memberships RENAME CONSTRAINT organizations_users_organization_id_fkey TO memberships_organization_id_fkey;
+ALTER TABLE memberships RENAME CONSTRAINT organizations_users_created_by_fkey TO memberships_created_by_fkey;
+ALTER TABLE memberships RENAME CONSTRAINT organizations_users_updated_by_fkey TO memberships_updated_by_fkey;
+
+ALTER TABLE memberships RENAME CONSTRAINT organizations_users_user_id_organization_id_key TO memberships_user_id_organization_id_key;
+
+ALTER TABLE memberships RENAME CONSTRAINT organizations_users_pkey TO memberships_pkey;
+
+ALTER INDEX idx_organizations_users_user_id RENAME TO idx_memberships_user_id;
+ALTER INDEX idx_organizations_users_organization_id RENAME TO idx_memberships_organization_id;

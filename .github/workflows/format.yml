@@ -3,7 +3,7 @@ on:
   pull_request:
   workflow_dispatch:
 jobs:
-  backend-format-check:
+  format-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

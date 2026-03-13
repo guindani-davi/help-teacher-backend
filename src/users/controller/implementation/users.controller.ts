@@ -2,87 +2,53 @@ import {
   Body,
   Controller,
   Get,
-  HttpStatus,
+  Inject,
   Param,
   Post,
-  Res,
+  UseGuards,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import { AuthGuard } from '../../../auth/guards/jwt/jwt.guard';
+import { CreateUserBodyDTO } from '../../dtos/create-user.dto';
 import {
-  RequestCreateUserDTO,
-  ResponseCreateUserDTO,
-} from '../../dtos/create-user.dto';
-import {
-  RequestGetUserByEmailDTO,
-  RequestGetUserByIdDTO,
-  ResponseGetUserDTO,
+  GetUserByEmailParamsDTO,
+  GetUserByIdParamsDTO,
 } from '../../dtos/get-user.dto';
+import { User } from '../../model/user.model';
 import { IUsersService } from '../../service/i.users.service';
 import { IUsersController } from '../i.users.controller';
-import { relatedProjects } from '@vercel/related-projects';
 
 @Controller('users')
-export class UsersController implements IUsersController {
-  private readonly userService: IUsersService;
-
-  public constructor(userService: IUsersService) {
-    this.userService = userService;
+export class UsersController extends IUsersController {
+  public constructor(@Inject(IUsersService) userService: IUsersService) {
+    super(userService);
   }
 
   @Post()
-  async createUser(
-    @Body() body: RequestCreateUserDTO,
-    @Res() response: Response<ResponseCreateUserDTO | Record<string, never>>,
-  ): Promise<void> {
+  public async createUser(
+    @Body() body: CreateUserBodyDTO,
+  ): Promise<Omit<User, 'hashedPassword'>> {
     const createdUser = await this.userService.createUser(body);
-
-    if (!createdUser) {
-      response.status(HttpStatus.CONFLICT).json({});
-      return;
-    }
-
-    response.status(HttpStatus.CREATED).json(createdUser);
-    return;
+    const { hashedPassword, ...userWithoutPassword } = createdUser;
+    return userWithoutPassword;
   }
 
+  @UseGuards(AuthGuard)
   @Get('id/:id')
-  async getUserById(
-    @Param() params: RequestGetUserByIdDTO,
-    @Res() response: Response<ResponseGetUserDTO | Record<string, never>>,
-  ): Promise<void> {
-    const returnedUser = await this.userService.getUserById(params);
-
-    if (!returnedUser) {
-      response.status(HttpStatus.NOT_FOUND).json({});
-      return;
-    }
-
-    response.status(HttpStatus.OK).json(returnedUser);
-    return;
+  public async getUserById(
+    @Param() params: GetUserByIdParamsDTO,
+  ): Promise<Omit<User, 'hashedPassword'>> {
+    const user = await this.userService.getUserById(params);
+    const { hashedPassword, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 
+  @UseGuards(AuthGuard)
   @Get('email/:email')
-  async getUserByEmail(
-    @Param() params: RequestGetUserByEmailDTO,
-    @Res() response: Response<ResponseGetUserDTO | Record<string, never>>,
-  ): Promise<void> {
-    const hasRelatedProjects = process.env['VERCEL_RELATED_PROJECTS'];
-
-    console.log('Related projects from config:', hasRelatedProjects);
-
-    if (hasRelatedProjects) {
-      const projects = relatedProjects();
-      console.log('Related projects:', projects);
-    }
-
-    const returnedUser = await this.userService.getUserByEmail(params);
-
-    if (!returnedUser) {
-      response.status(HttpStatus.NOT_FOUND).json({});
-      return;
-    }
-
-    response.status(HttpStatus.OK).json(returnedUser);
-    return;
+  public async getUserByEmail(
+    @Param() params: GetUserByEmailParamsDTO,
+  ): Promise<Omit<User, 'hashedPassword'>> {
+    const user = await this.userService.getUserByEmail(params);
+    const { hashedPassword, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 }

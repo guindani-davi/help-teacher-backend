@@ -1,27 +1,25 @@
-import type { Response } from 'express';
+import { CreateUserBodyDTO } from '../dtos/create-user.dto';
 import {
-  RequestCreateUserDTO,
-  ResponseCreateUserDTO,
-} from '../dtos/create-user.dto';
-import {
-  RequestGetUserByEmailDTO,
-  RequestGetUserByIdDTO,
-  ResponseGetUserDTO,
+  GetUserByEmailParamsDTO,
+  GetUserByIdParamsDTO,
 } from '../dtos/get-user.dto';
+import { User } from '../model/user.model';
+import { IUsersService } from '../service/i.users.service';
 
 export abstract class IUsersController {
+  protected readonly userService: IUsersService;
+
+  public constructor(userService: IUsersService) {
+    this.userService = userService;
+  }
+
   public abstract createUser(
-    body: RequestCreateUserDTO,
-    response: Response<ResponseCreateUserDTO | Record<string, never>>,
-  ): Promise<void>;
-
+    body: CreateUserBodyDTO,
+  ): Promise<Omit<User, 'hashedPassword'>>;
   public abstract getUserById(
-    params: RequestGetUserByIdDTO,
-    response: Response<ResponseGetUserDTO | Record<string, never>>,
-  ): Promise<void>;
-
+    params: GetUserByIdParamsDTO,
+  ): Promise<Omit<User, 'hashedPassword'>>;
   public abstract getUserByEmail(
-    params: RequestGetUserByEmailDTO,
-    response: Response<ResponseGetUserDTO | Record<string, never>>,
-  ): Promise<void>;
+    params: GetUserByEmailParamsDTO,
+  ): Promise<Omit<User, 'hashedPassword'>>;
 }

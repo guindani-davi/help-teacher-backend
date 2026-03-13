@@ -18,6 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:integration": "npm run db:up && jest --config ./test/integration/jest-integration.json --runInBand",
     "db:up": "npx supabase start",
     "db:down": "npx supabase stop --no-backup",
     "db:types": "npx supabase gen types --local > src/database/types.ts"
@@ -26,15 +27,17 @@
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/jwt": "^11.0.2",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.1",
     "@supabase/supabase-js": "^2.93.2",
-    "@vercel/related-projects": "^1.0.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "husky": "^9.1.7",
+    "nodemailer": "^8.0.1",
     "reflect-metadata": "^0.2.2",
+    "resend": "^6.9.2",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
@@ -45,6 +48,7 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
+    "@types/nodemailer": "^7.0.10",
     "@types/supertest": "^6.0.2",
     "globals": "^16.0.0",
     "jest": "^30.0.0",
@@ -76,8 +80,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "lint-staged": {
-    "*.ts": "npm run format"
   }
 }

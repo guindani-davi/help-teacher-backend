@@ -1,0 +1,348 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-03-10T00:00:00.000Z",
+  "__export_source": "insomnia.importers",
+  "resources": [
+    {
+      "_id": "wrk_help_tutor",
+      "_type": "workspace",
+      "name": "Help Tutor Backend",
+      "description": "API collection for Help Tutor Backend",
+      "scope": "collection",
+      "parentId": null
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "name": "Base Environment",
+      "parentId": "wrk_help_tutor",
+      "data": {
+        "base_url": "http://localhost:3000",
+        "token": ""
+      }
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "name": "Auth",
+      "parentId": "wrk_help_tutor",
+      "description": "Authentication endpoints"
+    },
+    {
+      "_id": "fld_users",
+      "_type": "request_group",
+      "name": "Users",
+      "parentId": "wrk_help_tutor",
+      "description": "User management endpoints"
+    },
+    {
+      "_id": "fld_organizations",
+      "_type": "request_group",
+      "name": "Organizations",
+      "parentId": "wrk_help_tutor",
+      "description": "Organization management endpoints"
+    },
+    {
+      "_id": "fld_memberships",
+      "_type": "request_group",
+      "name": "Memberships",
+      "parentId": "fld_organizations",
+      "description": "Membership endpoints within organizations"
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "name": "Login",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/login",
+      "parentId": "fld_auth",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"your_password\"\n}"
+      }
+    },
+    {
+      "_id": "req_request_password_reset",
+      "_type": "request",
+      "name": "Request Password Reset",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/request-password-reset",
+      "parentId": "fld_auth",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"user@example.com\"\n}"
+      }
+    },
+    {
+      "_id": "req_reset_password",
+      "_type": "request",
+      "name": "Reset Password",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/reset-password",
+      "parentId": "fld_auth",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"token\": \"reset_token_here\",\n  \"newPassword\": \"new_password\"\n}"
+      }
+    },
+    {
+      "_id": "req_refresh_token",
+      "_type": "request",
+      "name": "Refresh Token",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/refresh",
+      "parentId": "fld_auth",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"refreshToken\": \"refresh_token_here\"\n}"
+      }
+    },
+    {
+      "_id": "req_logout",
+      "_type": "request",
+      "name": "Logout",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/logout",
+      "parentId": "fld_auth",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"refreshToken\": \"refresh_token_here\"\n}"
+      }
+    },
+    {
+      "_id": "req_create_user",
+      "_type": "request",
+      "name": "Create User",
+      "method": "POST",
+      "url": "{{ _.base_url }}/users",
+      "parentId": "fld_users",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"your_password\",\n  \"name\": \"John\",\n  \"surname\": \"Doe\"\n}"
+      }
+    },
+    {
+      "_id": "req_get_user_by_id",
+      "_type": "request",
+      "name": "Get User by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/users/id/USER_UUID_HERE",
+      "parentId": "fld_users",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_user_by_email",
+      "_type": "request",
+      "name": "Get User by Email",
+      "method": "GET",
+      "url": "{{ _.base_url }}/users/email/user@example.com",
+      "parentId": "fld_users",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_create_organization",
+      "_type": "request",
+      "name": "Create Organization",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations",
+      "parentId": "fld_organizations",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"My Organization\"\n}"
+      }
+    },
+    {
+      "_id": "req_get_organization_by_slug",
+      "_type": "request",
+      "name": "Get Organization by Slug",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization",
+      "parentId": "fld_organizations",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_organization",
+      "_type": "request",
+      "name": "Update Organization",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/organizations/my-organization",
+      "parentId": "fld_organizations",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Updated Organization Name\"\n}"
+      }
+    },
+    {
+      "_id": "req_delete_organization",
+      "_type": "request",
+      "name": "Delete Organization",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization",
+      "parentId": "fld_organizations",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_membership",
+      "_type": "request",
+      "name": "Get My Membership",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/membership",
+      "parentId": "fld_memberships",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_members",
+      "_type": "request",
+      "name": "Get Members",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/members",
+      "parentId": "fld_memberships",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_member",
+      "_type": "request",
+      "name": "Update Member",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/organizations/my-organization/members/MEMBER_UUID_HERE",
+      "parentId": "fld_memberships",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"roles\": [\"admin\"],\n  \"isActive\": true\n}"
+      }
+    },
+    {
+      "_id": "req_delete_member",
+      "_type": "request",
+      "name": "Delete Member",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/members/MEMBER_UUID_HERE",
+      "parentId": "fld_memberships",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_transfer_ownership",
+      "_type": "request",
+      "name": "Transfer Ownership",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/organizations/my-organization/transfer-ownership/MEMBER_UUID_HERE",
+      "parentId": "fld_memberships",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    }
+  ]
+}

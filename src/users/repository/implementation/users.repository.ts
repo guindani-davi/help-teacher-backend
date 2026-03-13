@@ -1,71 +1,89 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { EntityAlreadyExistsException } from '../../../common/exceptions/entity-already-exists.exception';
+import { EntityNotFoundException } from '../../../common/exceptions/entity-not-found.exception';
+import { PostgresErrorCode } from '../../../database/enums/postgres-error-code.enum';
+import { DatabaseException } from '../../../database/exceptions/database.exception';
 import { IDatabaseService } from '../../../database/service/i.database.service';
 import { Database } from '../../../database/types';
-import { CreateUserRepositoryDTO } from '../../dtos/create-user.dto';
-import {
-  RequestGetUserByEmailDTO,
-  RequestGetUserByIdDTO,
-} from '../../dtos/get-user.dto';
+import { IHelpersService } from '../../../helpers/service/i.helpers.service';
+import { CreateUserBodyDTO } from '../../dtos/create-user.dto';
+import { User } from '../../model/user.model';
 import { IUsersRepository } from '../i.users.repository';
 
 @Injectable()
-export class UsersRepository implements IUsersRepository {
-  private readonly databaseService: IDatabaseService;
-
-  public constructor(databaseService: IDatabaseService) {
-    this.databaseService = databaseService;
+export class UsersRepository extends IUsersRepository {
+  public constructor(
+    @Inject(IDatabaseService) databaseService: IDatabaseService,
+    @Inject(IHelpersService) helperService: IHelpersService,
+  ) {
+    super(databaseService, helperService);
   }
 
-  async createUser(
-    dto: CreateUserRepositoryDTO,
-  ): Promise<Database['public']['Tables']['users']['Row'] | null> {
+  public async createUser(body: CreateUserBodyDTO): Promise<User> {
     const createdUser = await this.databaseService
       .from('users')
       .insert({
-        email: dto.email,
-        hashed_password: dto.hashedPassword,
-        name: dto.name,
-        surname: dto.surname,
+        email: body.email,
+        hashed_password: body.password,
+        name: body.name,
+        surname: body.surname,
       })
       .select()
       .single();
 
     if (createdUser.error) {
-      return null;
+      if (createdUser.error.code === PostgresErrorCode.UNIQUE_VIOLATION) {
+        throw new EntityAlreadyExistsException('User');
+      }
+
+      throw new DatabaseException();
     }
 
-    return createdUser.data;
+    return this.mapToEntity(createdUser.data);
   }
 
-  async getUserById(
-    dto: RequestGetUserByIdDTO,
-  ): Promise<Database['public']['Tables']['users']['Row'] | null> {
+  public async getUserById(id: string): Promise<User> {
     const returnedUser = await this.databaseService
       .from('users')
-      .select('*')
-      .eq('id', dto.id)
+      .select()
+      .eq('id', id)
       .single();
 
-    if (returnedUser.error) {
-      return null;
+    if (!returnedUser.data) {
+      throw new EntityNotFoundException('User');
     }
 
-    return returnedUser.data;
+    return this.mapToEntity(returnedUser.data);
   }
 
-  async getUserByEmail(
-    dto: RequestGetUserByEmailDTO,
-  ): Promise<Database['public']['Tables']['users']['Row'] | null> {
+  public async getUserByEmail(email: string): Promise<User> {
     const returnedUser = await this.databaseService
       .from('users')
-      .select('*')
-      .eq('email', dto.email)
+      .select()
+      .eq('email', email)
       .single();
 
-    if (returnedUser.error) {
-      return null;
+    if (returnedUser.error || !returnedUser.data) {
+      throw new EntityNotFoundException('User');
     }
 
-    return returnedUser.data;
+    return this.mapToEntity(returnedUser.data);
+  }
+
+  protected mapToEntity(
+    data: Database['public']['Tables']['users']['Row'],
+  ): User {
+    const { createdAtDate, updatedAtDate } =
+      this.helperService.parseEntitiesDates(data.created_at, data.updated_at);
+
+    return new User(
+      data.id,
+      data.email,
+      data.name,
+      data.surname,
+      data.hashed_password,
+      createdAtDate,
+      updatedAtDate,
+    );
   }
 }

@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
+import { AuthModule } from '../auth/auth.module';
 import { DatabaseModule } from '../database/database.module';
 import { HelpersModule } from '../helpers/helpers.module';
 import { UsersController } from './controller/implementation/users.controller';
@@ -9,8 +10,7 @@ import { UsersService } from './service/implementation/users.service';
 
 @Module({
   controllers: [UsersController],
-  exports: [],
-  imports: [DatabaseModule, HelpersModule],
+  imports: [DatabaseModule, HelpersModule, forwardRef(() => AuthModule)],
   providers: [
     {
       provide: IUsersRepository,
@@ -21,5 +21,6 @@ import { UsersService } from './service/implementation/users.service';
       useClass: UsersService,
     },
   ],
+  exports: [IUsersService, IUsersRepository],
 })
 export class UsersModule {}

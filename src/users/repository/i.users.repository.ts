@@ -1,18 +1,25 @@
+import { IDatabaseService } from '../../database/service/i.database.service';
 import { Database } from '../../database/types';
-import { CreateUserRepositoryDTO } from '../dtos/create-user.dto';
-import {
-  RequestGetUserByEmailDTO,
-  RequestGetUserByIdDTO,
-} from '../dtos/get-user.dto';
+import { IHelpersService } from '../../helpers/service/i.helpers.service';
+import { CreateUserBodyDTO } from '../dtos/create-user.dto';
+import { User } from '../model/user.model';
 
 export abstract class IUsersRepository {
-  public abstract createUser(
-    dto: CreateUserRepositoryDTO,
-  ): Promise<Database['public']['Tables']['users']['Row'] | null>;
-  public abstract getUserById(
-    dto: RequestGetUserByIdDTO,
-  ): Promise<Database['public']['Tables']['users']['Row'] | null>;
-  public abstract getUserByEmail(
-    dto: RequestGetUserByEmailDTO,
-  ): Promise<Database['public']['Tables']['users']['Row'] | null>;
+  protected readonly databaseService: IDatabaseService;
+  protected readonly helperService: IHelpersService;
+
+  public constructor(
+    databaseService: IDatabaseService,
+    helperService: IHelpersService,
+  ) {
+    this.databaseService = databaseService;
+    this.helperService = helperService;
+  }
+
+  public abstract createUser(body: CreateUserBodyDTO): Promise<User>;
+  public abstract getUserById(id: string): Promise<User>;
+  public abstract getUserByEmail(email: string): Promise<User>;
+  protected abstract mapToEntity(
+    data: Database['public']['Tables']['users']['Row'],
+  ): User;
 }
