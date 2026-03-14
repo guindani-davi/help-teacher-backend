@@ -33,12 +33,13 @@ export class ResendEmailService extends IEmailService {
     organizationName: string,
   ): Promise<void> {
     const invitesLink = `${this.frontendUrl}/invites`;
+    const safeName = this.escapeHtml(organizationName);
 
     await this.resend.emails.send({
       from: this.fromAddress,
       to,
       subject: `You've been invited to join ${organizationName}`,
-      html: `<p>You've been invited to join <strong>${organizationName}</strong>. Click <a href="${invitesLink}">here</a> to view your pending invites.</p>`,
+      html: `<p>You've been invited to join <strong>${safeName}</strong>. Click <a href="${invitesLink}">here</a> to view your pending invites.</p>`,
     });
   }
 }

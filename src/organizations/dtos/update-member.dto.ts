@@ -1,6 +1,5 @@
 import {
   IsArray,
-  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -23,8 +22,4 @@ export class UpdateMemberBodyDTO {
   @IsEnum(RolesEnum, { each: true })
   @IsOptional()
   public roles?: RolesEnum[];
-
-  @IsOptional()
-  @IsBoolean()
-  public isActive?: boolean;
 }

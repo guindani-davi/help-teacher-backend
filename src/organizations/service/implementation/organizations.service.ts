@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { RolesEnum } from '../../../auth/enums/roles.enum';
 import { JwtPayload } from '../../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
+import { PaginatedResponse } from '../../../common/responses/paginated.response';
 import { IHelpersService } from '../../../helpers/service/i.helpers.service';
 import { CreateOrganizationBodyDTO } from '../../dtos/create-organization.dto';
 import { DeleteMemberParamsDTO } from '../../dtos/delete-member.dto';
@@ -79,11 +81,12 @@ export class OrganizationsService extends IOrganizationsService {
 
   public async getMembers(
     params: GetOrganizationBySlugParamsDTO,
-  ): Promise<Membership[]> {
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Membership>> {
     const organization =
       await this.organizationsRepository.getOrganizationBySlug(params);
 
-    return this.organizationsRepository.getMembers(organization.id);
+    return this.organizationsRepository.getMembers(organization.id, pagination);
   }
 
   public async updateMember(

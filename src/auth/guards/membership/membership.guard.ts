@@ -48,7 +48,7 @@ export class MembershipGuard implements CanActivate {
       .from('memberships')
       .select()
       .eq('organization_id', organization.data.id)
-      .eq('user_id', user.id)
+      .eq('user_id', user.sub)
       .eq('is_active', true)
       .single();
 

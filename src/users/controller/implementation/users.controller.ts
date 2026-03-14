@@ -1,18 +1,9 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Inject,
-  Param,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
+import { CurrentUser } from '../../../auth/decorators/current-user.decorator';
 import { AuthGuard } from '../../../auth/guards/jwt/jwt.guard';
+import type { JwtPayload } from '../../../auth/payloads/jwt.payload';
 import { CreateUserBodyDTO } from '../../dtos/create-user.dto';
-import {
-  GetUserByEmailParamsDTO,
-  GetUserByIdParamsDTO,
-} from '../../dtos/get-user.dto';
 import { User } from '../../model/user.model';
 import { IUsersService } from '../../service/i.users.service';
 import { IUsersController } from '../i.users.controller';
@@ -24,6 +15,7 @@ export class UsersController extends IUsersController {
   }
 
   @Post()
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   public async createUser(
     @Body() body: CreateUserBodyDTO,
   ): Promise<Omit<User, 'hashedPassword'>> {
@@ -33,22 +25,12 @@ export class UsersController extends IUsersController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('id/:id')
-  public async getUserById(
-    @Param() params: GetUserByIdParamsDTO,
+  @Get('me')
+  public async getMe(
+    @CurrentUser() user: JwtPayload,
   ): Promise<Omit<User, 'hashedPassword'>> {
-    const user = await this.userService.getUserById(params);
-    const { hashedPassword, ...userWithoutPassword } = user;
-    return userWithoutPassword;
-  }
-
-  @UseGuards(AuthGuard)
-  @Get('email/:email')
-  public async getUserByEmail(
-    @Param() params: GetUserByEmailParamsDTO,
-  ): Promise<Omit<User, 'hashedPassword'>> {
-    const user = await this.userService.getUserByEmail(params);
-    const { hashedPassword, ...userWithoutPassword } = user;
+    const fullUser = await this.userService.getUserById({ id: user.sub });
+    const { hashedPassword, ...userWithoutPassword } = fullUser;
     return userWithoutPassword;
   }
 }

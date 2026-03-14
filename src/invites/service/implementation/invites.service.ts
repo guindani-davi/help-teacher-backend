@@ -1,7 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { RolesEnum } from '../../../auth/enums/roles.enum';
 import type { JwtPayload } from '../../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
 import { EntityAlreadyExistsException } from '../../../common/exceptions/entity-already-exists.exception';
+import { PaginatedResponse } from '../../../common/responses/paginated.response';
 import { IEmailService } from '../../../email/service/i.email.service';
 import { ForbiddenOperationException } from '../../../organizations/exceptions/forbidden-operation.exception';
 import type { Membership } from '../../../organizations/model/membership.model';
@@ -63,7 +65,7 @@ export class InvitesService extends IInvitesService {
       organization.id,
       body.email,
       body.roles,
-      user.id,
+      user.sub,
       expiresAt,
     );
 
@@ -74,11 +76,15 @@ export class InvitesService extends IInvitesService {
 
   public async getOrganizationInvites(
     params: GetOrganizationInvitesParamsDTO,
-  ): Promise<Invite[]> {
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>> {
     const organization =
       await this.organizationsService.getOrganizationBySlug(params);
 
-    return this.invitesRepository.getOrganizationInvites(organization.id);
+    return this.invitesRepository.getOrganizationInvites(
+      organization.id,
+      pagination,
+    );
   }
 
   public async getInviteById(
@@ -102,7 +108,7 @@ export class InvitesService extends IInvitesService {
     this.verifyInviteActionable(invite);
 
     const isAlreadyMember = await this.invitesRepository.isAlreadyMember(
-      user.id,
+      user.sub,
       invite.organizationId,
     );
 
@@ -111,7 +117,7 @@ export class InvitesService extends IInvitesService {
     }
 
     await this.invitesRepository.createMembership(
-      user.id,
+      user.sub,
       invite.organizationId,
       invite.roles,
       invite.invitedBy,
@@ -162,8 +168,14 @@ export class InvitesService extends IInvitesService {
     );
   }
 
-  public async getPendingInvites(user: JwtPayload): Promise<Invite[]> {
-    return this.invitesRepository.getPendingInvitesByEmail(user.email);
+  public async getPendingInvites(
+    user: JwtPayload,
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>> {
+    return this.invitesRepository.getPendingInvitesByEmail(
+      user.email,
+      pagination,
+    );
   }
 
   private validateInviteRoles(

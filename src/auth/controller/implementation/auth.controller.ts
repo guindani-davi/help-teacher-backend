@@ -6,6 +6,7 @@ import {
   Inject,
   Post,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { LoginDTO } from '../../dtos/login.dto';
 import { RefreshTokenDTO } from '../../dtos/refresh-token.dto';
 import { RequestPasswordResetDTO } from '../../dtos/request-password-reset.dto';
@@ -22,12 +23,14 @@ export class AuthController extends IAuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   public async login(@Body() body: LoginDTO): Promise<AuthTokensResponse> {
     return await this.authService.login(body);
   }
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   public async refresh(
     @Body() body: RefreshTokenDTO,
   ): Promise<AuthTokensResponse> {
@@ -42,6 +45,7 @@ export class AuthController extends IAuthController {
 
   @Post('request-password-reset')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Throttle({ default: { ttl: 60_000, limit: 3 } })
   public async requestPasswordReset(
     @Body() body: RequestPasswordResetDTO,
   ): Promise<void> {
@@ -50,6 +54,7 @@ export class AuthController extends IAuthController {
 
   @Post('reset-password')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   public async resetPassword(@Body() body: ResetPasswordDTO): Promise<void> {
     await this.authService.resetPassword(body);
   }

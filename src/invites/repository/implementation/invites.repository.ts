@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { RolesEnum } from '../../../auth/enums/roles.enum';
+import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
 import { EntityNotFoundException } from '../../../common/exceptions/entity-not-found.exception';
+import { PaginatedResponse } from '../../../common/responses/paginated.response';
 import { DatabaseException } from '../../../database/exceptions/database.exception';
 import { IDatabaseService } from '../../../database/service/i.database.service';
 import { Database } from '../../../database/types';
@@ -62,34 +64,56 @@ export class InvitesRepository extends IInvitesRepository {
 
   public async getOrganizationInvites(
     organizationId: string,
-  ): Promise<Invite[]> {
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>> {
+    const { from, to } = pagination.getRange();
+
     const result = await this.databaseService
       .from('invites')
-      .select()
+      .select('*', { count: 'exact' })
       .eq('organization_id', organizationId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(from, to);
 
     if (result.error) {
       throw new DatabaseException();
     }
 
-    return result.data.map((row) => this.mapToEntity(row));
+    const items = result.data.map((row) => this.mapToEntity(row));
+    return new PaginatedResponse(
+      items,
+      result.count ?? 0,
+      pagination.page,
+      pagination.limit,
+    );
   }
 
-  public async getPendingInvitesByEmail(email: string): Promise<Invite[]> {
+  public async getPendingInvitesByEmail(
+    email: string,
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>> {
+    const { from, to } = pagination.getRange();
+
     const result = await this.databaseService
       .from('invites')
-      .select()
+      .select('*', { count: 'exact' })
       .eq('email', email)
       .eq('status', InviteStatusEnum.PENDING)
       .gt('expires_at', new Date().toISOString())
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(from, to);
 
     if (result.error) {
       throw new DatabaseException();
     }
 
-    return result.data.map((row) => this.mapToEntity(row));
+    const items = result.data.map((row) => this.mapToEntity(row));
+    return new PaginatedResponse(
+      items,
+      result.count ?? 0,
+      pagination.page,
+      pagination.limit,
+    );
   }
 
   public async hasPendingInvite(

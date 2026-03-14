@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { JwtPayload } from '../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
+import { PaginatedResponse } from '../../common/responses/paginated.response';
 import { IEmailService } from '../../email/service/i.email.service';
 import type { Membership } from '../../organizations/model/membership.model';
 import { IOrganizationsService } from '../../organizations/service/i.organizations.service';
@@ -39,7 +41,8 @@ export abstract class IInvitesService {
   ): Promise<Invite>;
   public abstract getOrganizationInvites(
     params: GetOrganizationInvitesParamsDTO,
-  ): Promise<Invite[]>;
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>>;
   public abstract getInviteById(
     params: GetInviteParamsDTO,
     user: JwtPayload,
@@ -53,5 +56,8 @@ export abstract class IInvitesService {
     user: JwtPayload,
   ): Promise<void>;
   public abstract revokeInvite(params: RevokeInviteParamsDTO): Promise<void>;
-  public abstract getPendingInvites(user: JwtPayload): Promise<Invite[]>;
+  public abstract getPendingInvites(
+    user: JwtPayload,
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>>;
 }
