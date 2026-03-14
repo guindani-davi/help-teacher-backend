@@ -15,4 +15,9 @@ export abstract class IEmailService {
     to: string,
     resetToken: string,
   ): Promise<void>;
+
+  public abstract sendInviteEmail(
+    to: string,
+    organizationName: string,
+  ): Promise<void>;
 }

@@ -34,6 +34,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      invites: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          organization_id: string
+          responded_at: string | null
+          roles: Database["public"]["Enums"]["role"][]
+          status: Database["public"]["Enums"]["invite_status"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          invited_by: string
+          organization_id: string
+          responded_at?: string | null
+          roles: Database["public"]["Enums"]["role"][]
+          status?: Database["public"]["Enums"]["invite_status"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          organization_id?: string
+          responded_at?: string | null
+          roles?: Database["public"]["Enums"]["role"][]
+          status?: Database["public"]["Enums"]["invite_status"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invites_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invites_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memberships: {
         Row: {
           created_at: string
@@ -255,6 +309,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      invite_status: "pending" | "accepted" | "rejected" | "revoked"
       role: "admin" | "teacher" | "responsible" | "owner"
     }
     CompositeTypes: {
@@ -386,6 +441,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      invite_status: ["pending", "accepted", "rejected", "revoked"],
       role: ["admin", "teacher", "responsible", "owner"],
     },
   },

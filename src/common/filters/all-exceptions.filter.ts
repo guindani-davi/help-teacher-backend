@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { DomainExceptionCode } from '../enums/domain-exception-code.enum';
 import { DomainException } from '../exceptions/domain.exception';
 import { ApiErrorResponse } from '../responses/api-error.response';
 
@@ -14,15 +15,20 @@ import { ApiErrorResponse } from '../responses/api-error.response';
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
-  private static readonly DOMAIN_CODE_TO_STATUS = new Map<string, HttpStatus>([
-    ['ENTITY_NOT_FOUND', HttpStatus.NOT_FOUND],
-    ['ENTITY_ALREADY_EXISTS', HttpStatus.CONFLICT],
-    ['SLUG_ALREADY_EXISTS', HttpStatus.CONFLICT],
-    ['DATABASE_ERROR', HttpStatus.INTERNAL_SERVER_ERROR],
-    ['INVALID_CREDENTIALS', HttpStatus.UNAUTHORIZED],
-    ['INVALID_RESET_TOKEN', HttpStatus.UNAUTHORIZED],
-    ['INVALID_REFRESH_TOKEN', HttpStatus.UNAUTHORIZED],
-    ['FORBIDDEN_OPERATION', HttpStatus.FORBIDDEN],
+  private static readonly DOMAIN_CODE_TO_STATUS = new Map<
+    DomainExceptionCode,
+    HttpStatus
+  >([
+    [DomainExceptionCode.ENTITY_NOT_FOUND, HttpStatus.NOT_FOUND],
+    [DomainExceptionCode.ENTITY_ALREADY_EXISTS, HttpStatus.CONFLICT],
+    [DomainExceptionCode.SLUG_ALREADY_EXISTS, HttpStatus.CONFLICT],
+    [DomainExceptionCode.DATABASE_ERROR, HttpStatus.INTERNAL_SERVER_ERROR],
+    [DomainExceptionCode.INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED],
+    [DomainExceptionCode.INVALID_RESET_TOKEN, HttpStatus.UNAUTHORIZED],
+    [DomainExceptionCode.INVALID_REFRESH_TOKEN, HttpStatus.UNAUTHORIZED],
+    [DomainExceptionCode.FORBIDDEN_OPERATION, HttpStatus.FORBIDDEN],
+    [DomainExceptionCode.INVITE_ALREADY_EXISTS, HttpStatus.CONFLICT],
+    [DomainExceptionCode.INVITE_EXPIRED, HttpStatus.GONE],
   ]);
 
   public catch(exception: unknown, host: ArgumentsHost): void {
