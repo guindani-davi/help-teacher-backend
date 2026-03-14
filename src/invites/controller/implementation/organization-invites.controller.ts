@@ -8,6 +8,7 @@ import {
   Inject,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CurrentMembership } from '../../../auth/decorators/current-membership.decorator';
@@ -18,6 +19,8 @@ import { AuthGuard } from '../../../auth/guards/jwt/jwt.guard';
 import { MembershipGuard } from '../../../auth/guards/membership/membership.guard';
 import { RolesGuard } from '../../../auth/guards/roles/roles.guard';
 import type { JwtPayload } from '../../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
+import { PaginatedResponse } from '../../../common/responses/paginated.response';
 import type { Membership } from '../../../organizations/model/membership.model';
 import {
   CreateInviteBodyDTO,
@@ -58,8 +61,9 @@ export class OrganizationInvitesController extends IOrganizationInvitesControlle
   @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
   public async getOrganizationInvites(
     @Param() params: GetOrganizationInvitesParamsDTO,
-  ): Promise<Invite[]> {
-    return this.invitesService.getOrganizationInvites(params);
+    @Query() pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>> {
+    return this.invitesService.getOrganizationInvites(params, pagination);
   }
 
   @Delete(':slug/invites/:inviteId')

@@ -1,8 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { RolesEnum } from '../../../auth/enums/roles.enum';
 import { JwtPayload } from '../../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
 import { EntityAlreadyExistsException } from '../../../common/exceptions/entity-already-exists.exception';
 import { EntityNotFoundException } from '../../../common/exceptions/entity-not-found.exception';
+import { PaginatedResponse } from '../../../common/responses/paginated.response';
 import { PostgresErrorCode } from '../../../database/enums/postgres-error-code.enum';
 import { DatabaseException } from '../../../database/exceptions/database.exception';
 import { IDatabaseService } from '../../../database/service/i.database.service';
@@ -44,7 +46,7 @@ export class OrganizationsRepository extends IOrganizationsRepository {
       {
         name: body.name,
         slug: slug,
-        created_by: user.id,
+        created_by: user.sub,
       };
 
     const createdOrg = await this.databaseService
@@ -64,10 +66,10 @@ export class OrganizationsRepository extends IOrganizationsRepository {
     const ownerMembership = await this.databaseService
       .from('memberships')
       .insert({
-        user_id: user.id,
+        user_id: user.sub,
         organization_id: createdOrg.data.id,
         roles: [RolesEnum.OWNER],
-        created_by: user.id,
+        created_by: user.sub,
       });
 
     if (ownerMembership.error) {
@@ -102,7 +104,7 @@ export class OrganizationsRepository extends IOrganizationsRepository {
   ): Promise<Organization> {
     const updatedOrgData: Database['public']['Tables']['organizations']['Update'] =
       {
-        updated_by: user.id,
+        updated_by: user.sub,
         updated_at: new Date().toISOString(),
         name: body.name,
         slug: newSlug ?? undefined,
@@ -154,7 +156,7 @@ export class OrganizationsRepository extends IOrganizationsRepository {
       .from('memberships')
       .select()
       .eq('organization_id', organizationId)
-      .eq('user_id', user.id)
+      .eq('user_id', user.sub)
       .eq('is_active', true)
       .single();
 
@@ -165,18 +167,30 @@ export class OrganizationsRepository extends IOrganizationsRepository {
     return this.mapToMembershipEntity(result.data);
   }
 
-  public async getMembers(organizationId: string): Promise<Membership[]> {
+  public async getMembers(
+    organizationId: string,
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Membership>> {
+    const { from, to } = pagination.getRange();
+
     const result = await this.databaseService
       .from('memberships')
-      .select()
+      .select('*', { count: 'exact' })
       .eq('organization_id', organizationId)
-      .eq('is_active', true);
+      .eq('is_active', true)
+      .range(from, to);
 
     if (result.error) {
       throw new DatabaseException();
     }
 
-    return result.data.map((row) => this.mapToMembershipEntity(row));
+    const items = result.data.map((row) => this.mapToMembershipEntity(row));
+    return new PaginatedResponse(
+      items,
+      result.count ?? 0,
+      pagination.page,
+      pagination.limit,
+    );
   }
 
   public async updateMember(
@@ -186,10 +200,9 @@ export class OrganizationsRepository extends IOrganizationsRepository {
   ): Promise<Membership> {
     const updatedMemberData: Database['public']['Tables']['memberships']['Update'] =
       {
-        updated_by: user.id,
+        updated_by: user.sub,
         updated_at: new Date().toISOString(),
         roles: body.roles,
-        is_active: body.isActive,
       };
 
     const updatedMember = await this.databaseService
@@ -219,7 +232,7 @@ export class OrganizationsRepository extends IOrganizationsRepository {
       .from('organizations')
       .update({
         is_active: false,
-        updated_by: user.id,
+        updated_by: user.sub,
         updated_at: now,
       })
       .eq('id', organization.id)
@@ -233,7 +246,7 @@ export class OrganizationsRepository extends IOrganizationsRepository {
       .from('memberships')
       .update({
         is_active: false,
-        updated_by: user.id,
+        updated_by: user.sub,
         updated_at: now,
       })
       .eq('organization_id', organization.id)
@@ -252,7 +265,7 @@ export class OrganizationsRepository extends IOrganizationsRepository {
       .from('memberships')
       .update({
         is_active: false,
-        updated_by: user.id,
+        updated_by: user.sub,
         updated_at: new Date().toISOString(),
       })
       .eq('id', params.memberId)
@@ -293,7 +306,7 @@ export class OrganizationsRepository extends IOrganizationsRepository {
       .from('memberships')
       .update({
         roles: [RolesEnum.ADMIN],
-        updated_by: user.id,
+        updated_by: user.sub,
         updated_at: now,
       })
       .eq('id', callerMembership.id)
@@ -307,7 +320,7 @@ export class OrganizationsRepository extends IOrganizationsRepository {
       .from('memberships')
       .update({
         roles: [RolesEnum.OWNER],
-        updated_by: user.id,
+        updated_by: user.sub,
         updated_at: now,
       })
       .eq('id', params.memberId)

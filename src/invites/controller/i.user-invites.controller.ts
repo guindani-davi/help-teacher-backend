@@ -1,4 +1,6 @@
 import type { JwtPayload } from '../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
+import { PaginatedResponse } from '../../common/responses/paginated.response';
 import { AcceptInviteParamsDTO } from '../dtos/accept-invite.dto';
 import { GetInviteParamsDTO } from '../dtos/get-invite.dto';
 import { RejectInviteParamsDTO } from '../dtos/reject-invite.dto';
@@ -12,7 +14,10 @@ export abstract class IUserInvitesController {
     this.invitesService = invitesService;
   }
 
-  public abstract getPendingInvites(user: JwtPayload): Promise<Invite[]>;
+  public abstract getPendingInvites(
+    user: JwtPayload,
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>>;
   public abstract getInviteById(
     params: GetInviteParamsDTO,
     user: JwtPayload,

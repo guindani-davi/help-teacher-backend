@@ -159,26 +159,11 @@
       }
     },
     {
-      "_id": "req_get_user_by_id",
+      "_id": "req_get_me",
       "_type": "request",
-      "name": "Get User by ID",
+      "name": "Get Me",
       "method": "GET",
-      "url": "{{ _.base_url }}/users/id/USER_UUID_HERE",
-      "parentId": "fld_users",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ _.token }}"
-        }
-      ],
-      "body": {}
-    },
-    {
-      "_id": "req_get_user_by_email",
-      "_type": "request",
-      "name": "Get User by Email",
-      "method": "GET",
-      "url": "{{ _.base_url }}/users/email/user@example.com",
+      "url": "{{ _.base_url }}/users/me",
       "parentId": "fld_users",
       "headers": [
         {
@@ -311,7 +296,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"roles\": [\"admin\"],\n  \"isActive\": true\n}"
+        "text": "{\n  \"roles\": [\"admin\"]\n}"
       }
     },
     {

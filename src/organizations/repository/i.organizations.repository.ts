@@ -1,4 +1,6 @@
 import { JwtPayload } from '../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
+import { PaginatedResponse } from '../../common/responses/paginated.response';
 import { IDatabaseService } from '../../database/service/i.database.service';
 import { Database } from '../../database/types';
 import { IHelpersService } from '../../helpers/service/i.helpers.service';
@@ -49,7 +51,10 @@ export abstract class IOrganizationsRepository {
     organizationId: string,
     user: JwtPayload,
   ): Promise<Membership>;
-  public abstract getMembers(organizationId: string): Promise<Membership[]>;
+  public abstract getMembers(
+    organizationId: string,
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Membership>>;
   public abstract updateMember(
     params: UpdateMemberParamsDTO,
     body: UpdateMemberBodyDTO,

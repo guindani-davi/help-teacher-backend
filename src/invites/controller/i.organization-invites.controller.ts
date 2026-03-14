@@ -1,4 +1,6 @@
 import type { JwtPayload } from '../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
+import { PaginatedResponse } from '../../common/responses/paginated.response';
 import type { Membership } from '../../organizations/model/membership.model';
 import {
   CreateInviteBodyDTO,
@@ -24,6 +26,7 @@ export abstract class IOrganizationInvitesController {
   ): Promise<Invite>;
   public abstract getOrganizationInvites(
     params: GetOrganizationInvitesParamsDTO,
-  ): Promise<Invite[]>;
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>>;
   public abstract revokeInvite(params: RevokeInviteParamsDTO): Promise<void>;
 }

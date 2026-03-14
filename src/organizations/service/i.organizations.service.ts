@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { JwtPayload } from '../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
+import { PaginatedResponse } from '../../common/responses/paginated.response';
 import { IHelpersService } from '../../helpers/service/i.helpers.service';
 import { CreateOrganizationBodyDTO } from '../dtos/create-organization.dto';
 import { DeleteMemberParamsDTO } from '../dtos/delete-member.dto';
@@ -51,7 +53,8 @@ export abstract class IOrganizationsService {
   ): Promise<Membership>;
   public abstract getMembers(
     params: GetMembersParamsDTO,
-  ): Promise<Membership[]>;
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Membership>>;
   public abstract updateMember(
     params: UpdateMemberParamsDTO,
     body: UpdateMemberBodyDTO,

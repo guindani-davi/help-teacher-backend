@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CurrentMembership } from '../../../auth/decorators/current-membership.decorator';
@@ -20,6 +21,8 @@ import { AuthGuard } from '../../../auth/guards/jwt/jwt.guard';
 import { MembershipGuard } from '../../../auth/guards/membership/membership.guard';
 import { RolesGuard } from '../../../auth/guards/roles/roles.guard';
 import type { JwtPayload } from '../../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
+import { PaginatedResponse } from '../../../common/responses/paginated.response';
 import { CreateOrganizationBodyDTO } from '../../dtos/create-organization.dto';
 import { DeleteMemberParamsDTO } from '../../dtos/delete-member.dto';
 import { DeleteOrganizationParamsDTO } from '../../dtos/delete-organization.dto';
@@ -70,8 +73,9 @@ export class OrganizationsController extends IOrganizationsController {
   @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
   public async getMembers(
     @Param() params: GetMembersParamsDTO,
-  ): Promise<Membership[]> {
-    return this.organizationsService.getMembers(params);
+    @Query() pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Membership>> {
+    return this.organizationsService.getMembers(params, pagination);
   }
 
   @Put(':slug/members/:memberId')

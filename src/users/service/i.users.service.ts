@@ -9,8 +9,6 @@ import { User } from '../model/user.model';
 import { IUsersRepository } from '../repository/i.users.repository';
 
 export abstract class IUsersService {
-  protected readonly SALT_ROUNDS_DEV: number;
-  protected readonly SALT_ROUNDS_PROD: number;
   protected readonly usersRepository: IUsersRepository;
   protected readonly configService: ConfigService;
   protected readonly helperService: IHelpersService;
@@ -20,8 +18,6 @@ export abstract class IUsersService {
     configService: ConfigService,
     helperService: IHelpersService,
   ) {
-    this.SALT_ROUNDS_DEV = 4;
-    this.SALT_ROUNDS_PROD = 14;
     this.usersRepository = usersRepository;
     this.configService = configService;
     this.helperService = helperService;

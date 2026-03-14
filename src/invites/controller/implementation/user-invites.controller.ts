@@ -6,11 +6,14 @@ import {
   Inject,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CurrentUser } from '../../../auth/decorators/current-user.decorator';
 import { AuthGuard } from '../../../auth/guards/jwt/jwt.guard';
 import type { JwtPayload } from '../../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
+import { PaginatedResponse } from '../../../common/responses/paginated.response';
 import { AcceptInviteParamsDTO } from '../../dtos/accept-invite.dto';
 import { GetInviteParamsDTO } from '../../dtos/get-invite.dto';
 import { RejectInviteParamsDTO } from '../../dtos/reject-invite.dto';
@@ -28,8 +31,9 @@ export class UserInvitesController extends IUserInvitesController {
   @Get('pending')
   public async getPendingInvites(
     @CurrentUser() user: JwtPayload,
-  ): Promise<Invite[]> {
-    return this.invitesService.getPendingInvites(user);
+    @Query() pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>> {
+    return this.invitesService.getPendingInvites(user, pagination);
   }
 
   @Get(':inviteId')

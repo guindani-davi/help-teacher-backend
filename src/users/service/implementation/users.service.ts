@@ -13,6 +13,9 @@ import { IUsersService } from '../i.users.service';
 
 @Injectable()
 export class UsersService extends IUsersService {
+  private static readonly SALT_ROUNDS_DEV = 4;
+  private static readonly SALT_ROUNDS_PROD = 14;
+
   public constructor(
     @Inject(IUsersRepository) usersRepository: IUsersRepository,
     @Inject(ConfigService) configService: ConfigService,
@@ -41,8 +44,8 @@ export class UsersService extends IUsersService {
     const pepperedPassword = this.pepperPassword(password);
 
     const saltRounds = this.helperService.isProduction()
-      ? this.SALT_ROUNDS_PROD
-      : this.SALT_ROUNDS_DEV;
+      ? UsersService.SALT_ROUNDS_PROD
+      : UsersService.SALT_ROUNDS_DEV;
 
     return bcrypt.hash(pepperedPassword, saltRounds);
   }
@@ -56,7 +59,7 @@ export class UsersService extends IUsersService {
   }
 
   protected pepperPassword(password: string): string {
-    const pepper = this.configService.get<string>('PASSWORD_PEPPER');
+    const pepper = this.configService.getOrThrow<string>('PASSWORD_PEPPER');
     return pepper + password;
   }
 }

@@ -1,4 +1,6 @@
 import { RolesEnum } from '../../auth/enums/roles.enum';
+import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
+import { PaginatedResponse } from '../../common/responses/paginated.response';
 import { IDatabaseService } from '../../database/service/i.database.service';
 import { Database } from '../../database/types';
 import { IHelpersService } from '../../helpers/service/i.helpers.service';
@@ -27,8 +29,12 @@ export abstract class IInvitesRepository {
   public abstract getInviteById(inviteId: string): Promise<Invite>;
   public abstract getOrganizationInvites(
     organizationId: string,
-  ): Promise<Invite[]>;
-  public abstract getPendingInvitesByEmail(email: string): Promise<Invite[]>;
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>>;
+  public abstract getPendingInvitesByEmail(
+    email: string,
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Invite>>;
   public abstract hasPendingInvite(
     organizationId: string,
     email: string,

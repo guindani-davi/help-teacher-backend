@@ -1,4 +1,6 @@
 import type { JwtPayload } from '../../auth/payloads/jwt.payload';
+import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
+import { PaginatedResponse } from '../../common/responses/paginated.response';
 import { CreateOrganizationBodyDTO } from '../dtos/create-organization.dto';
 import { DeleteMemberParamsDTO } from '../dtos/delete-member.dto';
 import { DeleteOrganizationParamsDTO } from '../dtos/delete-organization.dto';
@@ -39,7 +41,8 @@ export abstract class IOrganizationsController {
   public abstract getMembership(membership: Membership): Promise<Membership>;
   public abstract getMembers(
     params: GetMembersParamsDTO,
-  ): Promise<Membership[]>;
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<Membership>>;
   public abstract updateMember(
     params: UpdateMemberParamsDTO,
     body: UpdateMemberBodyDTO,

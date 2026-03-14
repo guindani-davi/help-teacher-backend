@@ -32,7 +32,7 @@ export class AuthService extends IAuthService {
     const payload = await this.validateUser(dto);
 
     const accessToken = await this.jwtService.signAsync(payload);
-    const refreshToken = await this.generateRefreshToken(payload.id);
+    const refreshToken = await this.generateRefreshToken(payload.sub);
 
     return new AuthTokensResponse(accessToken, refreshToken);
   }
@@ -63,7 +63,7 @@ export class AuthService extends IAuthService {
     const user = await this.userService.getUserById({
       id: result.data.user_id,
     });
-    const { hashedPassword, ...payload } = user;
+    const payload: JwtPayload = { sub: user.id, email: user.email };
 
     const accessToken = await this.jwtService.signAsync(payload);
     const refreshToken = await this.generateRefreshToken(result.data.user_id);
@@ -99,6 +99,12 @@ export class AuthService extends IAuthService {
       const user = await this.userService.getUserByEmail({
         email: dto.email,
       });
+
+      await this.databaseService
+        .from('password_reset_tokens')
+        .update({ used_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .is('used_at', null);
 
       const rawToken = crypto.randomBytes(32).toString('hex');
       const tokenHash = crypto
@@ -164,9 +170,7 @@ export class AuthService extends IAuthService {
         throw new InvalidCredentialsException();
       }
 
-      const { hashedPassword, ...payload } = returnedUser;
-
-      return payload;
+      return { sub: returnedUser.id, email: returnedUser.email };
     } catch {
       throw new InvalidCredentialsException();
     }
