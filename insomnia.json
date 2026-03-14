@@ -343,6 +343,139 @@
         }
       ],
       "body": {}
+    },
+    {
+      "_id": "fld_invites",
+      "_type": "request_group",
+      "name": "Invites",
+      "parentId": "wrk_help_tutor",
+      "description": "Invite management endpoints"
+    },
+    {
+      "_id": "fld_org_invites",
+      "_type": "request_group",
+      "name": "Organization Invites",
+      "parentId": "fld_invites",
+      "description": "Organization-scoped invite endpoints"
+    },
+    {
+      "_id": "fld_user_invites",
+      "_type": "request_group",
+      "name": "User Invites",
+      "parentId": "fld_invites",
+      "description": "User-scoped invite endpoints"
+    },
+    {
+      "_id": "req_create_invite",
+      "_type": "request",
+      "name": "Create Invite",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/invites",
+      "parentId": "fld_org_invites",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"invited@example.com\",\n  \"roles\": [\"teacher\"]\n}"
+      }
+    },
+    {
+      "_id": "req_get_organization_invites",
+      "_type": "request",
+      "name": "Get Organization Invites",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/invites",
+      "parentId": "fld_org_invites",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_revoke_invite",
+      "_type": "request",
+      "name": "Revoke Invite",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/invites/INVITE_UUID_HERE",
+      "parentId": "fld_org_invites",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_pending_invites",
+      "_type": "request",
+      "name": "Get Pending Invites",
+      "method": "GET",
+      "url": "{{ _.base_url }}/invites/pending",
+      "parentId": "fld_user_invites",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_invite_by_id",
+      "_type": "request",
+      "name": "Get Invite by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/invites/INVITE_UUID_HERE",
+      "parentId": "fld_user_invites",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_accept_invite",
+      "_type": "request",
+      "name": "Accept Invite",
+      "method": "POST",
+      "url": "{{ _.base_url }}/invites/INVITE_UUID_HERE/accept",
+      "parentId": "fld_user_invites",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_reject_invite",
+      "_type": "request",
+      "name": "Reject Invite",
+      "method": "POST",
+      "url": "{{ _.base_url }}/invites/INVITE_UUID_HERE/reject",
+      "parentId": "fld_user_invites",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
     }
   ]
 }
