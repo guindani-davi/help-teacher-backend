@@ -33,5 +33,9 @@ export abstract class IUsersService {
     plainPassword: string,
     hashedPassword: string,
   ): Promise<boolean>;
+  public abstract updatePassword(
+    userId: string,
+    newPassword: string,
+  ): Promise<void>;
   protected abstract pepperPassword(password: string): string;
 }

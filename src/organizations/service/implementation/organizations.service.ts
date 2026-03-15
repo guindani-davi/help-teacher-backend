@@ -178,6 +178,27 @@ export class OrganizationsService extends IOrganizationsService {
     );
   }
 
+  public async isUserMember(
+    userId: string,
+    organizationId: string,
+  ): Promise<boolean> {
+    return this.organizationsRepository.isUserMember(userId, organizationId);
+  }
+
+  public async addMember(
+    userId: string,
+    organizationId: string,
+    roles: RolesEnum[],
+    createdBy: string,
+  ): Promise<void> {
+    await this.organizationsRepository.createMembership(
+      userId,
+      organizationId,
+      roles,
+      createdBy,
+    );
+  }
+
   protected async generateUniqueSlug(name: string): Promise<string> {
     const baseSlug = this.helperService.generateSlug(name);
     let slug = baseSlug;

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { DatabaseModule } from '../database/database.module';
 import { HelpersModule } from '../helpers/helpers.module';
@@ -10,7 +10,7 @@ import { OrganizationsService } from './service/implementation/organizations.ser
 
 @Module({
   controllers: [OrganizationsController],
-  imports: [DatabaseModule, HelpersModule, AuthModule],
+  imports: [DatabaseModule, HelpersModule, forwardRef(() => AuthModule)],
   providers: [
     {
       provide: IOrganizationsRepository,

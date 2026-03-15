@@ -70,6 +70,20 @@ export class UsersRepository extends IUsersRepository {
     return this.mapToEntity(returnedUser.data);
   }
 
+  public async updatePassword(
+    userId: string,
+    hashedPassword: string,
+  ): Promise<void> {
+    const result = await this.databaseService
+      .from('users')
+      .update({ hashed_password: hashedPassword })
+      .eq('id', userId);
+
+    if (result.error) {
+      throw new DatabaseException();
+    }
+  }
+
   protected mapToEntity(
     data: Database['public']['Tables']['users']['Row'],
   ): User {

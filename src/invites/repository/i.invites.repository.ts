@@ -43,16 +43,6 @@ export abstract class IInvitesRepository {
     inviteId: string,
     status: InviteStatusEnum,
   ): Promise<void>;
-  public abstract isAlreadyMember(
-    userId: string,
-    organizationId: string,
-  ): Promise<boolean>;
-  public abstract createMembership(
-    userId: string,
-    organizationId: string,
-    roles: RolesEnum[],
-    createdBy: string,
-  ): Promise<void>;
   protected abstract mapToEntity(
     data: Database['public']['Tables']['invites']['Row'],
   ): Invite;

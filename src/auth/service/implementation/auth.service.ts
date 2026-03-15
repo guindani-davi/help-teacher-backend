@@ -140,12 +140,7 @@ export class AuthService extends IAuthService {
       throw new InvalidResetTokenException();
     }
 
-    const hashedPassword = await this.userService.hashPassword(dto.newPassword);
-
-    await this.databaseService
-      .from('users')
-      .update({ hashed_password: hashedPassword })
-      .eq('id', result.data.user_id);
+    await this.userService.updatePassword(result.data.user_id, dto.newPassword);
 
     await this.databaseService
       .from('password_reset_tokens')

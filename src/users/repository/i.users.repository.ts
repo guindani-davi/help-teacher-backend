@@ -19,6 +19,10 @@ export abstract class IUsersRepository {
   public abstract createUser(body: CreateUserBodyDTO): Promise<User>;
   public abstract getUserById(id: string): Promise<User>;
   public abstract getUserByEmail(email: string): Promise<User>;
+  public abstract updatePassword(
+    userId: string,
+    hashedPassword: string,
+  ): Promise<void>;
   protected abstract mapToEntity(
     data: Database['public']['Tables']['users']['Row'],
   ): User;

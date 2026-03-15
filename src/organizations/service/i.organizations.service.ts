@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { RolesEnum } from '../../auth/enums/roles.enum';
 import type { JwtPayload } from '../../auth/payloads/jwt.payload';
 import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../common/responses/paginated.response';
@@ -75,5 +76,15 @@ export abstract class IOrganizationsService {
     callerMembership: Membership,
     user: JwtPayload,
   ): Promise<Membership>;
+  public abstract isUserMember(
+    userId: string,
+    organizationId: string,
+  ): Promise<boolean>;
+  public abstract addMember(
+    userId: string,
+    organizationId: string,
+    roles: RolesEnum[],
+    createdBy: string,
+  ): Promise<void>;
   protected abstract generateUniqueSlug(name: string): Promise<string>;
 }
