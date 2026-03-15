@@ -4,6 +4,7 @@ import type { JwtPayload } from '../../auth/payloads/jwt.payload';
 import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../common/responses/paginated.response';
 import { IHelpersService } from '../../helpers/service/i.helpers.service';
+import { ISubscriptionsService } from '../../subscriptions/service/i.subscriptions.service';
 import { CreateOrganizationBodyDTO } from '../dtos/create-organization.dto';
 import { DeleteMemberParamsDTO } from '../dtos/delete-member.dto';
 import { DeleteOrganizationParamsDTO } from '../dtos/delete-organization.dto';
@@ -27,13 +28,16 @@ import { IOrganizationsRepository } from '../repository/i.organizations.reposito
 export abstract class IOrganizationsService {
   protected readonly organizationsRepository: IOrganizationsRepository;
   protected readonly helperService: IHelpersService;
+  protected readonly subscriptionsService: ISubscriptionsService;
 
   public constructor(
     organizationsRepository: IOrganizationsRepository,
     helperService: IHelpersService,
+    subscriptionsService: ISubscriptionsService,
   ) {
     this.organizationsRepository = organizationsRepository;
     this.helperService = helperService;
+    this.subscriptionsService = subscriptionsService;
   }
 
   public abstract createOrganization(

@@ -271,8 +271,96 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          asaas_description: string
+          billing_cycle: Database["public"]["Enums"]["billing_cycle"] | null
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          price_cents: number
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at: string | null
+        }
+        Insert: {
+          asaas_description: string
+          billing_cycle?: Database["public"]["Enums"]["billing_cycle"] | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          price_cents: number
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string | null
+        }
+        Update: {
+          asaas_description?: string
+          billing_cycle?: Database["public"]["Enums"]["billing_cycle"] | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_cents?: number
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          asaas_subscription_id: string | null
+          canceled_at: string | null
+          created_at: string
+          current_period_end: string | null
+          id: string
+          plan_id: string
+          status: Database["public"]["Enums"]["subscription_status"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          asaas_subscription_id?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan_id: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          asaas_subscription_id?: string | null
+          canceled_at?: string | null
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan_id?: string
+          status?: Database["public"]["Enums"]["subscription_status"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
+          asaas_customer_id: string | null
           created_at: string
           email: string
           hashed_password: string
@@ -282,6 +370,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          asaas_customer_id?: string | null
           created_at?: string
           email: string
           hashed_password: string
@@ -291,6 +380,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          asaas_customer_id?: string | null
           created_at?: string
           email?: string
           hashed_password?: string
@@ -298,6 +388,27 @@ export type Database = {
           name?: string
           surname?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      webhook_events: {
+        Row: {
+          event_id: string
+          event_type: string
+          id: string
+          processed_at: string
+        }
+        Insert: {
+          event_id: string
+          event_type: string
+          id?: string
+          processed_at?: string
+        }
+        Update: {
+          event_id?: string
+          event_type?: string
+          id?: string
+          processed_at?: string
         }
         Relationships: []
       }
@@ -309,8 +420,11 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      billing_cycle: "monthly" | "yearly"
       invite_status: "pending" | "accepted" | "rejected" | "revoked"
       role: "admin" | "teacher" | "responsible" | "owner"
+      subscription_status: "active" | "past_due" | "canceled"
+      subscription_tier: "free" | "basic" | "pro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -441,8 +555,11 @@ export const Constants = {
   },
   public: {
     Enums: {
+      billing_cycle: ["monthly", "yearly"],
       invite_status: ["pending", "accepted", "rejected", "revoked"],
       role: ["admin", "teacher", "responsible", "owner"],
+      subscription_status: ["active", "past_due", "canceled"],
+      subscription_tier: ["free", "basic", "pro"],
     },
   },
 } as const

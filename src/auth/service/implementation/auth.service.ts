@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
 import { IDatabaseService } from '../../../database/service/i.database.service';
 import { IEmailService } from '../../../email/service/i.email.service';
+import { ISubscriptionsRepository } from '../../../subscriptions/repository/i.subscriptions.repository';
 import { IUsersService } from '../../../users/service/i.users.service';
 import { LoginDTO } from '../../dtos/login.dto';
 import { RefreshTokenDTO } from '../../dtos/refresh-token.dto';
@@ -24,14 +25,31 @@ export class AuthService extends IAuthService {
     @Inject(JwtService) jwtService: JwtService,
     @Inject(IEmailService) emailService: IEmailService,
     @Inject(IDatabaseService) databaseService: IDatabaseService,
+    @Inject(ISubscriptionsRepository)
+    subscriptionsRepository: ISubscriptionsRepository,
   ) {
-    super(userService, jwtService, emailService, databaseService);
+    super(
+      userService,
+      jwtService,
+      emailService,
+      databaseService,
+      subscriptionsRepository,
+    );
   }
 
   public async login(dto: LoginDTO): Promise<AuthTokensResponse> {
     const payload = await this.validateUser(dto);
 
-    const accessToken = await this.jwtService.signAsync(payload);
+    const subscriptionTier = await this.subscriptionsRepository.getUserTier(
+      payload.sub,
+    );
+
+    const fullPayload: JwtPayload = {
+      ...payload,
+      subscriptionTier,
+    };
+
+    const accessToken = await this.jwtService.signAsync(fullPayload);
     const refreshToken = await this.generateRefreshToken(payload.sub);
 
     return new AuthTokensResponse(accessToken, refreshToken);
@@ -63,7 +81,16 @@ export class AuthService extends IAuthService {
     const user = await this.userService.getUserById({
       id: result.data.user_id,
     });
-    const payload: JwtPayload = { sub: user.id, email: user.email };
+
+    const subscriptionTier = await this.subscriptionsRepository.getUserTier(
+      user.id,
+    );
+
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      subscriptionTier,
+    };
 
     const accessToken = await this.jwtService.signAsync(payload);
     const refreshToken = await this.generateRefreshToken(result.data.user_id);
@@ -150,7 +177,9 @@ export class AuthService extends IAuthService {
     await this.revokeAllUserRefreshTokens(result.data.user_id);
   }
 
-  protected async validateUser(dto: LoginDTO): Promise<JwtPayload> {
+  protected async validateUser(
+    dto: LoginDTO,
+  ): Promise<Omit<JwtPayload, 'subscriptionTier'>> {
     try {
       const returnedUser = await this.userService.getUserByEmail({
         email: dto.email,

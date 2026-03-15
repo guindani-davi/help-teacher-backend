@@ -29,6 +29,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
     [DomainExceptionCode.FORBIDDEN_OPERATION, HttpStatus.FORBIDDEN],
     [DomainExceptionCode.INVITE_ALREADY_EXISTS, HttpStatus.CONFLICT],
     [DomainExceptionCode.INVITE_EXPIRED, HttpStatus.GONE],
+    [DomainExceptionCode.INSUFFICIENT_SUBSCRIPTION, HttpStatus.FORBIDDEN],
+    [
+      DomainExceptionCode.ACTIVE_SUBSCRIPTION_REQUIRED,
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    ],
+    [DomainExceptionCode.CANNOT_DOWNGRADE, HttpStatus.UNPROCESSABLE_ENTITY],
+    [DomainExceptionCode.ASAAS_API_ERROR, HttpStatus.BAD_GATEWAY],
   ]);
 
   public catch(exception: unknown, host: ArgumentsHost): void {
