@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { DatabaseModule } from '../database/database.module';
 import { EmailModule } from '../email/email.module';
-import { HelpersModule } from '../helpers/helpers.module';
+import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './controller/implementation/auth.controller';
 import { AuthGuard } from './guards/jwt/jwt.guard';
@@ -24,7 +24,7 @@ import { AuthService } from './service/implementation/auth.service';
     forwardRef(() => UsersModule),
     EmailModule,
     DatabaseModule,
-    HelpersModule,
+    forwardRef(() => OrganizationsModule),
   ],
   providers: [
     {

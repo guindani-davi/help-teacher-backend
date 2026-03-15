@@ -1,3 +1,4 @@
+import { RolesEnum } from '../../auth/enums/roles.enum';
 import { JwtPayload } from '../../auth/payloads/jwt.payload';
 import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../common/responses/paginated.response';
@@ -74,6 +75,16 @@ export abstract class IOrganizationsRepository {
     callerMembership: Membership,
     user: JwtPayload,
   ): Promise<Membership>;
+  public abstract isUserMember(
+    userId: string,
+    organizationId: string,
+  ): Promise<boolean>;
+  public abstract createMembership(
+    userId: string,
+    organizationId: string,
+    roles: RolesEnum[],
+    createdBy: string,
+  ): Promise<void>;
   protected abstract mapToEntity(
     data: Database['public']['Tables']['organizations']['Row'],
   ): Organization;

@@ -58,6 +58,14 @@ export class UsersService extends IUsersService {
     return bcrypt.compare(pepperedPassword, hashedPassword);
   }
 
+  public async updatePassword(
+    userId: string,
+    newPassword: string,
+  ): Promise<void> {
+    const hashedPassword = await this.hashPassword(newPassword);
+    await this.usersRepository.updatePassword(userId, hashedPassword);
+  }
+
   protected pepperPassword(password: string): string {
     const pepper = this.configService.getOrThrow<string>('PASSWORD_PEPPER');
     return pepper + password;

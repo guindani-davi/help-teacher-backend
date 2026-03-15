@@ -107,7 +107,7 @@ export class InvitesService extends IInvitesService {
     this.verifyInviteOwnership(invite, user);
     this.verifyInviteActionable(invite);
 
-    const isAlreadyMember = await this.invitesRepository.isAlreadyMember(
+    const isAlreadyMember = await this.organizationsService.isUserMember(
       user.sub,
       invite.organizationId,
     );
@@ -116,7 +116,7 @@ export class InvitesService extends IInvitesService {
       throw new EntityAlreadyExistsException('Membership');
     }
 
-    await this.invitesRepository.createMembership(
+    await this.organizationsService.addMember(
       user.sub,
       invite.organizationId,
       invite.roles,

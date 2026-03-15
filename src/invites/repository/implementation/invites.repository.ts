@@ -158,39 +158,6 @@ export class InvitesRepository extends IInvitesRepository {
     }
   }
 
-  public async isAlreadyMember(
-    userId: string,
-    organizationId: string,
-  ): Promise<boolean> {
-    const result = await this.databaseService
-      .from('memberships')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('organization_id', organizationId)
-      .eq('is_active', true)
-      .single();
-
-    return !!result.data;
-  }
-
-  public async createMembership(
-    userId: string,
-    organizationId: string,
-    roles: RolesEnum[],
-    createdBy: string,
-  ): Promise<void> {
-    const result = await this.databaseService.from('memberships').insert({
-      user_id: userId,
-      organization_id: organizationId,
-      roles,
-      created_by: createdBy,
-    });
-
-    if (result.error) {
-      throw new DatabaseException();
-    }
-  }
-
   protected mapToEntity(
     data: Database['public']['Tables']['invites']['Row'],
   ): Invite {
