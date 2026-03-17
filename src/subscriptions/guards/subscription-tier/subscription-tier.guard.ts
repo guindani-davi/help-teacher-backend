@@ -8,11 +8,9 @@ import {
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import type { JwtPayload } from '../../../auth/payloads/jwt.payload';
-import { REQUIRED_TIER_KEY } from '../../decorators/required-tier.decorator';
-import {
-  SubscriptionTierEnum,
-  TIER_HIERARCHY,
-} from '../../enums/subscription-tier.enum';
+import type { Membership } from '../../../organizations/model/membership.model';
+import { ALLOWED_TIERS_KEY } from '../../decorators/allowed-tiers.decorator';
+import { SubscriptionTierEnum } from '../../enums/subscription-tier.enum';
 import { ISubscriptionsService } from '../../service/i.subscriptions.service';
 
 @Injectable()
@@ -32,12 +30,11 @@ export class SubscriptionTierGuard implements CanActivate {
   }
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredTier = this.reflector.get<SubscriptionTierEnum | undefined>(
-      REQUIRED_TIER_KEY,
-      context.getHandler(),
-    );
+    const allowedTiers = this.reflector.getAllAndOverride<
+      SubscriptionTierEnum[] | undefined
+    >(ALLOWED_TIERS_KEY, [context.getHandler(), context.getClass()]);
 
-    if (!requiredTier) {
+    if (!allowedTiers) {
       return true;
     }
 
@@ -48,24 +45,33 @@ export class SubscriptionTierGuard implements CanActivate {
       throw new ForbiddenException('Insufficient subscription tier');
     }
 
-    const userTier = user.subscriptionTier ?? SubscriptionTierEnum.FREE;
+    const effectiveTier = await this.resolveEffectiveTier(request, user);
 
-    if (
-      SubscriptionTierGuard.WRITE_METHODS.includes(request.method.toUpperCase())
-    ) {
-      const currentTier = await this.subscriptionsService.getUserTier(user.sub);
-
-      if (TIER_HIERARCHY[currentTier] < TIER_HIERARCHY[requiredTier]) {
-        throw new ForbiddenException('Insufficient subscription tier');
-      }
-
-      return true;
-    }
-
-    if (TIER_HIERARCHY[userTier] < TIER_HIERARCHY[requiredTier]) {
+    if (!allowedTiers.includes(effectiveTier)) {
       throw new ForbiddenException('Insufficient subscription tier');
     }
 
     return true;
+  }
+
+  private async resolveEffectiveTier(
+    request: Request,
+    user: JwtPayload,
+  ): Promise<SubscriptionTierEnum> {
+    const membership = (request as any).membership as Membership | undefined;
+
+    if (membership) {
+      return this.subscriptionsService.getOrganizationOwnerTier(
+        membership.organizationId,
+      );
+    }
+
+    if (
+      SubscriptionTierGuard.WRITE_METHODS.includes(request.method.toUpperCase())
+    ) {
+      return this.subscriptionsService.getUserTier(user.sub);
+    }
+
+    return user.subscriptionTier ?? SubscriptionTierEnum.FREE;
   }
 }

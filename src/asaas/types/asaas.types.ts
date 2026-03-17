@@ -3,13 +3,10 @@ export interface CreateCheckoutSessionParams {
   valueCents: number;
   billingCycle: string;
   externalReference: string;
-  customerName?: string;
-  customerEmail?: string;
 }
 
 export interface AsaasCheckoutSession {
   url: string;
-  expiresInMinutes: number;
 }
 
 export interface AsaasSubscription {

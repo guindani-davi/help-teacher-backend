@@ -4,6 +4,7 @@ import { DatabaseModule } from '../database/database.module';
 import { EmailModule } from '../email/email.module';
 import { HelpersModule } from '../helpers/helpers.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { OrganizationInvitesController } from './controller/implementation/organization-invites.controller';
 import { UserInvitesController } from './controller/implementation/user-invites.controller';
 import { IInvitesRepository } from './repository/i.invites.repository';
@@ -18,6 +19,7 @@ import { InvitesService } from './service/implementation/invites.service';
     AuthModule,
     OrganizationsModule,
     EmailModule,
+    SubscriptionsModule,
   ],
   controllers: [OrganizationInvitesController, UserInvitesController],
   providers: [

@@ -15,7 +15,7 @@ import { OrganizationsService } from './service/implementation/organizations.ser
     DatabaseModule,
     HelpersModule,
     forwardRef(() => AuthModule),
-    SubscriptionsModule,
+    forwardRef(() => SubscriptionsModule),
   ],
   providers: [
     {

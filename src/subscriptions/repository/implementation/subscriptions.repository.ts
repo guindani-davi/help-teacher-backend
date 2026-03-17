@@ -69,7 +69,9 @@ export class SubscriptionsRepository extends ISubscriptionsRepository {
   public async getUserTier(userId: string): Promise<SubscriptionTierEnum> {
     const result = await this.databaseService
       .from('user_subscriptions')
-      .select('plan_id, subscription_plans(tier)')
+      .select(
+        'plan_id, subscription_plans!user_subscriptions_plan_id_fkey(tier)',
+      )
       .eq('user_id', userId)
       .eq('status', SubscriptionStatusEnum.ACTIVE)
       .single();
@@ -78,21 +80,39 @@ export class SubscriptionsRepository extends ISubscriptionsRepository {
       return SubscriptionTierEnum.FREE;
     }
 
-    const plans = result.data.subscription_plans as unknown as {
+    const plan = result.data.subscription_plans as unknown as {
       tier: string;
     } | null;
 
-    if (!plans) {
+    if (!plan) {
       return SubscriptionTierEnum.FREE;
     }
 
-    return plans.tier as SubscriptionTierEnum;
+    return plan.tier as SubscriptionTierEnum;
+  }
+
+  public async getOrganizationOwnerTier(
+    organizationId: string,
+  ): Promise<SubscriptionTierEnum> {
+    const ownerResult = await this.databaseService
+      .from('memberships')
+      .select('user_id')
+      .eq('organization_id', organizationId)
+      .contains('roles', ['owner'])
+      .eq('is_active', true)
+      .single();
+
+    if (!ownerResult.data) {
+      return SubscriptionTierEnum.FREE;
+    }
+
+    return this.getUserTier(ownerResult.data.user_id);
   }
 
   public async createUserSubscription(
     userId: string,
     planId: string,
-    asaasSubscriptionId: string,
+    asaasSubscriptionId: string | null,
   ): Promise<UserSubscription> {
     const result = await this.databaseService
       .from('user_subscriptions')
@@ -182,6 +202,27 @@ export class SubscriptionsRepository extends ISubscriptionsRepository {
     return this.mapToSubscription(result.data);
   }
 
+  public async updateAsaasSubscriptionId(
+    userId: string,
+    asaasSubscriptionId: string,
+  ): Promise<UserSubscription> {
+    const result = await this.databaseService
+      .from('user_subscriptions')
+      .update({
+        asaas_subscription_id: asaasSubscriptionId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (result.error || !result.data) {
+      throw new DatabaseException();
+    }
+
+    return this.mapToSubscription(result.data);
+  }
+
   protected mapToPlan(
     data: Database['public']['Tables']['subscription_plans']['Row'],
   ): SubscriptionPlan {
@@ -201,6 +242,114 @@ export class SubscriptionsRepository extends ISubscriptionsRepository {
     );
   }
 
+  public async getFreePlan(): Promise<SubscriptionPlan> {
+    const result = await this.databaseService
+      .from('subscription_plans')
+      .select()
+      .eq('tier', SubscriptionTierEnum.FREE)
+      .eq('is_active', true)
+      .single();
+
+    if (!result.data) {
+      throw new EntityNotFoundException('SubscriptionPlan');
+    }
+
+    return this.mapToPlan(result.data);
+  }
+
+  public async createFreeSubscription(
+    userId: string,
+  ): Promise<UserSubscription> {
+    const freePlan = await this.getFreePlan();
+
+    const result = await this.databaseService
+      .from('user_subscriptions')
+      .insert({
+        user_id: userId,
+        plan_id: freePlan.id,
+        asaas_subscription_id: null,
+        status: SubscriptionStatusEnum.ACTIVE,
+      })
+      .select()
+      .single();
+
+    if (result.error) {
+      if (result.error.code === PostgresErrorCode.UNIQUE_VIOLATION) {
+        throw new EntityAlreadyExistsException('UserSubscription');
+      }
+
+      throw new DatabaseException();
+    }
+
+    return this.mapToSubscription(result.data);
+  }
+
+  public async setPendingPlan(
+    userId: string,
+    planId: string,
+  ): Promise<UserSubscription> {
+    const result = await this.databaseService
+      .from('user_subscriptions')
+      .update({
+        pending_plan_id: planId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (result.error || !result.data) {
+      throw new DatabaseException();
+    }
+
+    return this.mapToSubscription(result.data);
+  }
+
+  public async clearPendingPlan(userId: string): Promise<UserSubscription> {
+    const result = await this.databaseService
+      .from('user_subscriptions')
+      .update({
+        pending_plan_id: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (result.error || !result.data) {
+      throw new DatabaseException();
+    }
+
+    return this.mapToSubscription(result.data);
+  }
+
+  public async applyPendingPlan(
+    userId: string,
+  ): Promise<UserSubscription | null> {
+    const subscription = await this.getUserSubscription(userId);
+
+    if (!subscription || !subscription.pendingPlanId) {
+      return null;
+    }
+
+    const result = await this.databaseService
+      .from('user_subscriptions')
+      .update({
+        plan_id: subscription.pendingPlanId,
+        pending_plan_id: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (result.error || !result.data) {
+      throw new DatabaseException();
+    }
+
+    return this.mapToSubscription(result.data);
+  }
+
   protected mapToSubscription(
     data: Database['public']['Tables']['user_subscriptions']['Row'],
   ): UserSubscription {
@@ -213,6 +362,7 @@ export class SubscriptionsRepository extends ISubscriptionsRepository {
       data.plan_id,
       data.asaas_subscription_id,
       data.status as SubscriptionStatusEnum,
+      data.pending_plan_id,
       data.current_period_end ? new Date(data.current_period_end) : null,
       data.canceled_at ? new Date(data.canceled_at) : null,
       createdAtDate,

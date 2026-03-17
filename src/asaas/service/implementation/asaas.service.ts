@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AsaasApiException } from '../../exceptions/asaas-api.exception';
 import {
@@ -11,13 +11,9 @@ import { IAsaasService } from '../i.asaas.service';
 
 @Injectable()
 export class AsaasService extends IAsaasService {
-  private static readonly CHECKOUT_EXPIRES_MINUTES = 30;
-
-  private readonly logger = new Logger(AsaasService.name);
   private readonly apiUrl: string;
   private readonly apiKey: string;
   private readonly successUrl: string;
-  private readonly cancelUrl: string;
 
   public constructor(@Inject(ConfigService) configService: ConfigService) {
     super(configService);
@@ -26,55 +22,32 @@ export class AsaasService extends IAsaasService {
     this.successUrl = this.configService.getOrThrow<string>(
       'ASAAS_CHECKOUT_SUCCESS_URL',
     );
-    this.cancelUrl = this.configService.getOrThrow<string>(
-      'ASAAS_CHECKOUT_CANCEL_URL',
-    );
   }
 
   public async createCheckoutSession(
     params: CreateCheckoutSessionParams,
   ): Promise<AsaasCheckoutSession> {
-    const today = new Date().toISOString().split('T')[0];
-
     const body = {
-      chargeTypes: ['RECURRENT'],
-      billingTypes: ['CREDIT_CARD'],
-      items: [
-        {
-          name: params.planName,
-          value: params.valueCents / 100,
-          quantity: 1,
-        },
-      ],
-      subscription: {
-        cycle: params.billingCycle.toUpperCase(),
-        nextDueDate: today,
-      },
+      name: params.planName,
+      value: params.valueCents / 100,
+      billingType: 'CREDIT_CARD',
+      chargeType: 'RECURRENT',
+      subscriptionCycle: params.billingCycle.toUpperCase(),
+      externalReference: params.externalReference,
       callback: {
         successUrl: this.successUrl,
-        cancelUrl: this.cancelUrl,
+        autoRedirect: true,
       },
-      externalReference: params.externalReference,
-      ...(params.customerName || params.customerEmail
-        ? {
-            customerData: {
-              ...(params.customerName ? { name: params.customerName } : {}),
-              ...(params.customerEmail ? { email: params.customerEmail } : {}),
-            },
-          }
-        : {}),
-      minutesToExpire: AsaasService.CHECKOUT_EXPIRES_MINUTES,
     };
 
     const response = await this.request<{ url: string }>(
       'POST',
-      '/v3/checkouts',
+      '/v3/paymentLinks',
       body,
     );
 
     return {
       url: response.url,
-      expiresInMinutes: AsaasService.CHECKOUT_EXPIRES_MINUTES,
     };
   }
 
@@ -152,7 +125,6 @@ export class AsaasService extends IAsaasService {
         errorDetails = `ASAAS API error: ${response.status} ${response.statusText}`;
       }
 
-      this.logger.error(errorDetails);
       throw new AsaasApiException(errorDetails);
     }
 

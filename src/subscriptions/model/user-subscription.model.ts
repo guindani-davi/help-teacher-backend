@@ -6,6 +6,7 @@ export class UserSubscription {
   public readonly planId: string;
   public readonly asaasSubscriptionId: string | null;
   public readonly status: SubscriptionStatusEnum;
+  public readonly pendingPlanId: string | null;
   public readonly currentPeriodEnd: Date | null;
   public readonly canceledAt: Date | null;
   public readonly createdAt: Date;
@@ -17,6 +18,7 @@ export class UserSubscription {
     planId: string,
     asaasSubscriptionId: string | null,
     status: SubscriptionStatusEnum,
+    pendingPlanId: string | null,
     currentPeriodEnd: Date | null,
     canceledAt: Date | null,
     createdAt: Date,
@@ -27,6 +29,7 @@ export class UserSubscription {
     this.planId = planId;
     this.asaasSubscriptionId = asaasSubscriptionId;
     this.status = status;
+    this.pendingPlanId = pendingPlanId;
     this.currentPeriodEnd = currentPeriodEnd;
     this.canceledAt = canceledAt;
     this.createdAt = createdAt;

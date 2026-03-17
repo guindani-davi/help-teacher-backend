@@ -1,15 +1,13 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { AsaasWebhookEventEnum } from '../../../asaas/enums/asaas-webhook-event.enum';
 import { IAsaasService } from '../../../asaas/service/i.asaas.service';
 import { IAuthService } from '../../../auth/service/i.auth.service';
-import { EntityAlreadyExistsException } from '../../../common/exceptions/entity-already-exists.exception';
 import { IUsersRepository } from '../../../users/repository/i.users.repository';
 import { SubscriptionStatusEnum } from '../../enums/subscription-status.enum';
 import {
   SubscriptionTierEnum,
   TIER_HIERARCHY,
 } from '../../enums/subscription-tier.enum';
-import { ActiveSubscriptionRequiredException } from '../../exceptions/active-subscription-required.exception';
 import { SubscriptionPlan } from '../../model/subscription-plan.model';
 import { UserSubscription } from '../../model/user-subscription.model';
 import { ISubscriptionsRepository } from '../../repository/i.subscriptions.repository';
@@ -18,8 +16,6 @@ import { ISubscriptionsService } from '../i.subscriptions.service';
 
 @Injectable()
 export class SubscriptionsService extends ISubscriptionsService {
-  private readonly logger = new Logger(SubscriptionsService.name);
-
   public constructor(
     @Inject(ISubscriptionsRepository)
     subscriptionsRepository: ISubscriptionsRepository,
@@ -35,170 +31,87 @@ export class SubscriptionsService extends ISubscriptionsService {
   }
 
   public async getMySubscription(userId: string): Promise<{
-    subscription: UserSubscription | null;
-    plan: SubscriptionPlan | null;
+    subscription: UserSubscription;
+    plan: SubscriptionPlan;
+    pendingPlan: SubscriptionPlan | null;
   }> {
     const subscription =
       await this.subscriptionsRepository.getUserSubscription(userId);
 
     if (!subscription) {
-      return { subscription: null, plan: null };
+      const created = await this.createFreeSubscription(userId);
+      const freePlan = await this.subscriptionsRepository.getFreePlan();
+      return { subscription: created, plan: freePlan, pendingPlan: null };
     }
 
     const plan = await this.subscriptionsRepository.getPlanById(
       subscription.planId,
     );
 
-    return { subscription, plan };
+    let pendingPlan: SubscriptionPlan | null = null;
+    if (subscription.pendingPlanId) {
+      pendingPlan = await this.subscriptionsRepository.getPlanById(
+        subscription.pendingPlanId,
+      );
+    }
+
+    return { subscription, plan, pendingPlan };
   }
 
   public async getUserTier(userId: string): Promise<SubscriptionTierEnum> {
     return this.subscriptionsRepository.getUserTier(userId);
   }
 
-  public async subscribe(
-    userId: string,
-    planId: string,
-    userName: string,
-    userEmail: string,
-  ): Promise<CheckoutSessionResponse> {
-    const plan = await this.subscriptionsRepository.getPlanById(planId);
-
-    if (plan.isFree()) {
-      throw new ActiveSubscriptionRequiredException();
-    }
-
-    const existingSubscription =
-      await this.subscriptionsRepository.getUserSubscription(userId);
-
-    if (
-      existingSubscription &&
-      existingSubscription.isActive() &&
-      existingSubscription.asaasSubscriptionId
-    ) {
-      throw new EntityAlreadyExistsException('UserSubscription');
-    }
-
-    const checkoutSession = await this.asaasService.createCheckoutSession({
-      planName: plan.name,
-      valueCents: plan.priceCents,
-      billingCycle: plan.billingCycle ?? 'monthly',
-      externalReference: userId,
-      customerName: userName,
-      customerEmail: userEmail,
-    });
-
-    return new CheckoutSessionResponse(
-      checkoutSession.url,
-      checkoutSession.expiresInMinutes,
+  public async getOrganizationOwnerTier(
+    organizationId: string,
+  ): Promise<SubscriptionTierEnum> {
+    return this.subscriptionsRepository.getOrganizationOwnerTier(
+      organizationId,
     );
+  }
+
+  public async createFreeSubscription(
+    userId: string,
+  ): Promise<UserSubscription> {
+    return this.subscriptionsRepository.createFreeSubscription(userId);
   }
 
   public async changePlan(
     userId: string,
     planId: string,
-  ): Promise<UserSubscription> {
-    const currentSubscription =
+  ): Promise<CheckoutSessionResponse | UserSubscription> {
+    const subscription =
       await this.subscriptionsRepository.getUserSubscription(userId);
 
-    if (
-      !currentSubscription ||
-      !currentSubscription.isActive() ||
-      !currentSubscription.asaasSubscriptionId
-    ) {
-      throw new ActiveSubscriptionRequiredException();
+    if (!subscription) {
+      throw new Error('User has no subscription record');
     }
 
     const currentPlan = await this.subscriptionsRepository.getPlanById(
-      currentSubscription.planId,
+      subscription.planId,
     );
     const targetPlan = await this.subscriptionsRepository.getPlanById(planId);
+
+    if (currentPlan.id === targetPlan.id) {
+      return subscription;
+    }
 
     const currentLevel = TIER_HIERARCHY[currentPlan.tier];
     const targetLevel = TIER_HIERARCHY[targetPlan.tier];
 
+    if (currentPlan.isFree() && !targetPlan.isFree()) {
+      return this.handleFreeToPayedUpgrade(userId, targetPlan);
+    }
+
     if (targetLevel > currentLevel) {
-      await this.asaasService.updateSubscription(
-        currentSubscription.asaasSubscriptionId,
-        {
-          value: targetPlan.priceCents / 100,
-          updatePendingPayments: true,
-        },
-      );
-
-      const updated =
-        await this.subscriptionsRepository.updateUserSubscriptionPlan(
-          userId,
-          planId,
-        );
-
-      await this.authService.revokeAllUserRefreshTokens(userId);
-
-      return updated;
+      return this.handlePayedUpgrade(userId, subscription, targetPlan);
     }
 
     if (targetLevel < currentLevel) {
-      await this.validateDowngrade(userId, currentPlan.tier, targetPlan.tier);
-
-      if (targetPlan.isFree()) {
-        await this.asaasService.cancelSubscription(
-          currentSubscription.asaasSubscriptionId,
-        );
-
-        await this.subscriptionsRepository.updateSubscriptionStatus(
-          currentSubscription.asaasSubscriptionId,
-          SubscriptionStatusEnum.CANCELED,
-          new Date(),
-        );
-      } else {
-        await this.asaasService.updateSubscription(
-          currentSubscription.asaasSubscriptionId,
-          {
-            value: targetPlan.priceCents / 100,
-            updatePendingPayments: true,
-          },
-        );
-
-        await this.subscriptionsRepository.updateUserSubscriptionPlan(
-          userId,
-          planId,
-        );
-      }
-
-      await this.authService.revokeAllUserRefreshTokens(userId);
-
-      const updatedSubscription =
-        await this.subscriptionsRepository.getUserSubscription(userId);
-
-      return updatedSubscription!;
+      return this.handleDowngrade(userId, subscription, targetPlan);
     }
 
-    return currentSubscription;
-  }
-
-  public async cancel(userId: string): Promise<void> {
-    const subscription =
-      await this.subscriptionsRepository.getUserSubscription(userId);
-
-    if (
-      !subscription ||
-      !subscription.isActive() ||
-      !subscription.asaasSubscriptionId
-    ) {
-      throw new ActiveSubscriptionRequiredException();
-    }
-
-    await this.asaasService.cancelSubscription(
-      subscription.asaasSubscriptionId,
-    );
-
-    await this.subscriptionsRepository.updateSubscriptionStatus(
-      subscription.asaasSubscriptionId,
-      SubscriptionStatusEnum.CANCELED,
-      new Date(),
-    );
-
-    await this.authService.revokeAllUserRefreshTokens(userId);
+    return subscription;
   }
 
   public async handleWebhookEvent(event: string, payload: any): Promise<void> {
@@ -215,16 +128,92 @@ export class SubscriptionsService extends ISubscriptionsService {
         await this.handleSubscriptionCanceled(payload);
         break;
       default:
-        this.logger.log(`Unhandled webhook event: ${event}`);
+        break;
     }
   }
 
-  protected async validateDowngrade(
-    _userId: string,
-    _fromTier: SubscriptionTierEnum,
-    _toTier: SubscriptionTierEnum,
-  ): Promise<void> {
-    return;
+  private async handleFreeToPayedUpgrade(
+    userId: string,
+    targetPlan: SubscriptionPlan,
+  ): Promise<CheckoutSessionResponse> {
+    await this.subscriptionsRepository.setPendingPlan(userId, targetPlan.id);
+
+    const checkoutSession = await this.asaasService.createCheckoutSession({
+      planName: targetPlan.name,
+      valueCents: targetPlan.priceCents,
+      billingCycle: targetPlan.billingCycle ?? 'monthly',
+      externalReference: userId,
+    });
+
+    return new CheckoutSessionResponse(checkoutSession.url);
+  }
+
+  private async handlePayedUpgrade(
+    userId: string,
+    subscription: UserSubscription,
+    targetPlan: SubscriptionPlan,
+  ): Promise<UserSubscription> {
+    if (subscription.asaasSubscriptionId) {
+      await this.asaasService.updateSubscription(
+        subscription.asaasSubscriptionId,
+        {
+          value: targetPlan.priceCents / 100,
+          updatePendingPayments: true,
+        },
+      );
+    }
+
+    if (subscription.pendingPlanId) {
+      await this.subscriptionsRepository.clearPendingPlan(userId);
+    }
+
+    const updated =
+      await this.subscriptionsRepository.updateUserSubscriptionPlan(
+        userId,
+        targetPlan.id,
+      );
+
+    await this.authService.revokeAllUserRefreshTokens(userId);
+
+    return updated;
+  }
+
+  private async handleDowngrade(
+    userId: string,
+    subscription: UserSubscription,
+    targetPlan: SubscriptionPlan,
+  ): Promise<UserSubscription> {
+    if (targetPlan.isFree()) {
+      if (subscription.asaasSubscriptionId) {
+        await this.asaasService.cancelSubscription(
+          subscription.asaasSubscriptionId,
+        );
+      }
+
+      const updated = await this.subscriptionsRepository.setPendingPlan(
+        userId,
+        targetPlan.id,
+      );
+
+      return updated;
+    }
+
+    if (subscription.asaasSubscriptionId) {
+      await this.asaasService.updateSubscription(
+        subscription.asaasSubscriptionId,
+        {
+          value: targetPlan.priceCents / 100,
+          updatePendingPayments: false,
+        },
+      );
+    }
+
+    const updated = await this.subscriptionsRepository.setPendingPlan(
+      userId,
+      targetPlan.id,
+    );
+
+    return updated;
   }
 
   private async handlePaymentConfirmed(payload: any): Promise<void> {
@@ -237,7 +226,6 @@ export class SubscriptionsService extends ISubscriptionsService {
       payload.subscription?.externalReference;
 
     if (!subscriptionId) {
-      this.logger.warn('Payment confirmed webhook without subscription ID');
       return;
     }
 
@@ -247,23 +235,27 @@ export class SubscriptionsService extends ISubscriptionsService {
       );
 
     if (existingSubscription) {
+      if (existingSubscription.pendingPlanId) {
+        await this.subscriptionsRepository.applyPendingPlan(
+          existingSubscription.userId,
+        );
+      }
+
       if (!existingSubscription.isActive()) {
         await this.subscriptionsRepository.updateSubscriptionStatus(
           subscriptionId,
           SubscriptionStatusEnum.ACTIVE,
         );
-
-        await this.authService.revokeAllUserRefreshTokens(
-          existingSubscription.userId,
-        );
       }
+
+      await this.authService.revokeAllUserRefreshTokens(
+        existingSubscription.userId,
+      );
+
       return;
     }
 
     if (!externalReference) {
-      this.logger.warn(
-        'Payment confirmed webhook without external reference for new subscription',
-      );
       return;
     }
 
@@ -272,46 +264,24 @@ export class SubscriptionsService extends ISubscriptionsService {
     if (customerId) {
       try {
         await this.usersRepository.updateAsaasCustomerId(userId, customerId);
-      } catch (error) {
-        this.logger.warn(
-          `Failed to update ASAAS customer ID for user ${userId}`,
-        );
-      }
+      } catch (error) {}
     }
 
-    const asaasSubscription =
-      await this.asaasService.getSubscription(subscriptionId);
+    const currentSubscription =
+      await this.subscriptionsRepository.getUserSubscription(userId);
 
-    const plans = await this.subscriptionsRepository.getActivePlans();
-    const matchingPlan = plans.find(
-      (p) => p.priceCents === Math.round(asaasSubscription.value * 100),
-    );
-
-    if (!matchingPlan) {
-      this.logger.error(
-        `No matching plan found for ASAAS subscription value: ${asaasSubscription.value}`,
-      );
+    if (!currentSubscription) {
       return;
     }
 
-    try {
-      await this.subscriptionsRepository.createUserSubscription(
+    if (currentSubscription.pendingPlanId) {
+      await this.subscriptionsRepository.updateAsaasSubscriptionId(
         userId,
-        matchingPlan.id,
         subscriptionId,
       );
-    } catch (error) {
-      if (error instanceof EntityAlreadyExistsException) {
-        this.logger.warn(
-          `User ${userId} already has a subscription, updating instead`,
-        );
-        await this.subscriptionsRepository.updateUserSubscriptionPlan(
-          userId,
-          matchingPlan.id,
-        );
-      } else {
-        throw error;
-      }
+
+      await this.subscriptionsRepository.applyPendingPlan(userId);
+    } else {
     }
 
     await this.authService.revokeAllUserRefreshTokens(userId);
@@ -322,7 +292,6 @@ export class SubscriptionsService extends ISubscriptionsService {
       payload.payment?.subscription ?? payload.subscription?.id;
 
     if (!subscriptionId) {
-      this.logger.warn('Payment overdue webhook without subscription ID');
       return;
     }
 
@@ -341,18 +310,35 @@ export class SubscriptionsService extends ISubscriptionsService {
       payload.payment?.subscription ?? payload.subscription?.id;
 
     if (!subscriptionId) {
-      this.logger.warn('Subscription canceled webhook without subscription ID');
       return;
     }
 
-    const updated = await this.subscriptionsRepository.updateSubscriptionStatus(
+    const subscription =
+      await this.subscriptionsRepository.getUserSubscriptionByAsaasId(
+        subscriptionId,
+      );
+
+    if (!subscription) {
+      return;
+    }
+
+    if (subscription.pendingPlanId) {
+      await this.subscriptionsRepository.applyPendingPlan(subscription.userId);
+      await this.authService.revokeAllUserRefreshTokens(subscription.userId);
+      return;
+    }
+
+    const freePlan = await this.subscriptionsRepository.getFreePlan();
+    await this.subscriptionsRepository.updateUserSubscriptionPlan(
+      subscription.userId,
+      freePlan.id,
+    );
+    await this.subscriptionsRepository.updateSubscriptionStatus(
       subscriptionId,
       SubscriptionStatusEnum.CANCELED,
       new Date(),
     );
 
-    if (updated) {
-      await this.authService.revokeAllUserRefreshTokens(updated.userId);
-    }
+    await this.authService.revokeAllUserRefreshTokens(subscription.userId);
   }
 }

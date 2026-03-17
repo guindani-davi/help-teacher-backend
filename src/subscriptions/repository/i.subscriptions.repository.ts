@@ -20,14 +20,21 @@ export abstract class ISubscriptionsRepository {
 
   public abstract getActivePlans(): Promise<SubscriptionPlan[]>;
   public abstract getPlanById(planId: string): Promise<SubscriptionPlan>;
+  public abstract getFreePlan(): Promise<SubscriptionPlan>;
   public abstract getUserSubscription(
     userId: string,
   ): Promise<UserSubscription | null>;
   public abstract getUserTier(userId: string): Promise<SubscriptionTierEnum>;
+  public abstract getOrganizationOwnerTier(
+    organizationId: string,
+  ): Promise<SubscriptionTierEnum>;
   public abstract createUserSubscription(
     userId: string,
     planId: string,
-    asaasSubscriptionId: string,
+    asaasSubscriptionId: string | null,
+  ): Promise<UserSubscription>;
+  public abstract createFreeSubscription(
+    userId: string,
   ): Promise<UserSubscription>;
   public abstract updateUserSubscriptionPlan(
     userId: string,
@@ -41,6 +48,18 @@ export abstract class ISubscriptionsRepository {
   public abstract getUserSubscriptionByAsaasId(
     asaasSubscriptionId: string,
   ): Promise<UserSubscription | null>;
+  public abstract setPendingPlan(
+    userId: string,
+    planId: string,
+  ): Promise<UserSubscription>;
+  public abstract clearPendingPlan(userId: string): Promise<UserSubscription>;
+  public abstract applyPendingPlan(
+    userId: string,
+  ): Promise<UserSubscription | null>;
+  public abstract updateAsaasSubscriptionId(
+    userId: string,
+    asaasSubscriptionId: string,
+  ): Promise<UserSubscription>;
   protected abstract mapToPlan(
     data: Database['public']['Tables']['subscription_plans']['Row'],
   ): SubscriptionPlan;

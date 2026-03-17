@@ -29,28 +29,23 @@ export abstract class ISubscriptionsService {
 
   public abstract getPlans(): Promise<SubscriptionPlan[]>;
   public abstract getMySubscription(userId: string): Promise<{
-    subscription: UserSubscription | null;
-    plan: SubscriptionPlan | null;
+    subscription: UserSubscription;
+    plan: SubscriptionPlan;
+    pendingPlan: SubscriptionPlan | null;
   }>;
   public abstract getUserTier(userId: string): Promise<SubscriptionTierEnum>;
-  public abstract subscribe(
+  public abstract getOrganizationOwnerTier(
+    organizationId: string,
+  ): Promise<SubscriptionTierEnum>;
+  public abstract createFreeSubscription(
     userId: string,
-    planId: string,
-    userName: string,
-    userEmail: string,
-  ): Promise<CheckoutSessionResponse>;
+  ): Promise<UserSubscription>;
   public abstract changePlan(
     userId: string,
     planId: string,
-  ): Promise<UserSubscription>;
-  public abstract cancel(userId: string): Promise<void>;
+  ): Promise<CheckoutSessionResponse | UserSubscription>;
   public abstract handleWebhookEvent(
     event: string,
     payload: any,
-  ): Promise<void>;
-  protected abstract validateDowngrade(
-    userId: string,
-    fromTier: SubscriptionTierEnum,
-    toTier: SubscriptionTierEnum,
   ): Promise<void>;
 }

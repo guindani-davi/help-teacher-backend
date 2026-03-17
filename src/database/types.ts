@@ -314,6 +314,7 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           id: string
+          pending_plan_id: string | null
           plan_id: string
           status: Database["public"]["Enums"]["subscription_status"]
           updated_at: string | null
@@ -325,6 +326,7 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           id?: string
+          pending_plan_id?: string | null
           plan_id: string
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string | null
@@ -336,12 +338,20 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           id?: string
+          pending_plan_id?: string | null
           plan_id?: string
           status?: Database["public"]["Enums"]["subscription_status"]
           updated_at?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_pending_plan_id_fkey"
+            columns: ["pending_plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "user_subscriptions_plan_id_fkey"
             columns: ["plan_id"]

@@ -5,7 +5,6 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
-  Logger,
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -20,7 +19,6 @@ import { IAsaasWebhookController } from '../i.asaas-webhook.controller';
 export class AsaasWebhookController extends IAsaasWebhookController {
   private static readonly MAX_EVENT_AGE_MS = 10 * 60 * 1000;
 
-  private readonly logger = new Logger(AsaasWebhookController.name);
   private readonly webhookToken: string;
 
   public constructor(
@@ -50,7 +48,6 @@ export class AsaasWebhookController extends IAsaasWebhookController {
     const event = body.event as string | undefined;
 
     if (!event) {
-      this.logger.warn('Webhook received without event type');
       return;
     }
 
@@ -59,7 +56,6 @@ export class AsaasWebhookController extends IAsaasWebhookController {
         await this.webhookEventsRepository.existsByEventId(eventId);
 
       if (alreadyProcessed) {
-        this.logger.log(`Webhook event ${eventId} already processed, skipping`);
         return;
       }
     }
@@ -72,9 +68,6 @@ export class AsaasWebhookController extends IAsaasWebhookController {
       const ageMs = now.getTime() - eventDate.getTime();
 
       if (ageMs > AsaasWebhookController.MAX_EVENT_AGE_MS) {
-        this.logger.warn(
-          `Webhook event ${eventId} is ${Math.round(ageMs / 1000)}s old, skipping`,
-        );
         return;
       }
     }

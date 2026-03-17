@@ -495,28 +495,6 @@
       "body": {}
     },
     {
-      "_id": "req_subscribe",
-      "_type": "request",
-      "name": "Subscribe",
-      "method": "POST",
-      "url": "{{ _.base_url }}/subscriptions/subscribe",
-      "parentId": "fld_subscriptions",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ _.token }}"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"planId\": \"PLAN_UUID_HERE\"\n}"
-      }
-    },
-    {
       "_id": "req_change_plan",
       "_type": "request",
       "name": "Change Plan",
@@ -537,21 +515,6 @@
         "mimeType": "application/json",
         "text": "{\n  \"planId\": \"PLAN_UUID_HERE\"\n}"
       }
-    },
-    {
-      "_id": "req_cancel_subscription",
-      "_type": "request",
-      "name": "Cancel Subscription",
-      "method": "POST",
-      "url": "{{ _.base_url }}/subscriptions/cancel",
-      "parentId": "fld_subscriptions",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ _.token }}"
-        }
-      ],
-      "body": {}
     },
     {
       "_id": "fld_asaas",
@@ -579,7 +542,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"id\": \"evt_123\",\n  \"event\": \"PAYMENT_CONFIRMED\",\n  \"dateCreated\": \"2026-03-15T12:00:00.000Z\",\n  \"payment\": {\n    \"subscription\": \"sub_123\",\n    \"customer\": \"cus_123\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
+        "text": "{\n  \"event\": \"PAYMENT_CONFIRMED\",\n  \"payment\": {\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
       }
     }
   ]
