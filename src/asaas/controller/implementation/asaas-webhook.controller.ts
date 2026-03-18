@@ -17,8 +17,6 @@ import { IAsaasWebhookController } from '../i.asaas-webhook.controller';
 @Controller('asaas')
 @SkipThrottle()
 export class AsaasWebhookController extends IAsaasWebhookController {
-  private static readonly MAX_EVENT_AGE_MS = 10 * 60 * 1000;
-
   private readonly webhookToken: string;
 
   public constructor(
@@ -56,18 +54,6 @@ export class AsaasWebhookController extends IAsaasWebhookController {
         await this.webhookEventsRepository.existsByEventId(eventId);
 
       if (alreadyProcessed) {
-        return;
-      }
-    }
-
-    const dateCreated = body.dateCreated as string | undefined;
-
-    if (dateCreated) {
-      const eventDate = new Date(dateCreated);
-      const now = new Date();
-      const ageMs = now.getTime() - eventDate.getTime();
-
-      if (ageMs > AsaasWebhookController.MAX_EVENT_AGE_MS) {
         return;
       }
     }
