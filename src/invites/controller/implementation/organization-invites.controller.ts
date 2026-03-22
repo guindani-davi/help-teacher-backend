@@ -22,6 +22,9 @@ import type { JwtPayload } from '../../../auth/payloads/jwt.payload';
 import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../../common/responses/paginated.response';
 import type { Membership } from '../../../organizations/model/membership.model';
+import { AllowedTiers } from '../../../subscriptions/decorators/allowed-tiers.decorator';
+import { SubscriptionTierEnum } from '../../../subscriptions/enums/subscription-tier.enum';
+import { SubscriptionTierGuard } from '../../../subscriptions/guards/subscription-tier/subscription-tier.guard';
 import {
   CreateInviteBodyDTO,
   CreateInviteParamsDTO,
@@ -33,15 +36,15 @@ import { IInvitesService } from '../../service/i.invites.service';
 import { IOrganizationInvitesController } from '../i.organization-invites.controller';
 
 @Controller('organizations')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, MembershipGuard, RolesGuard, SubscriptionTierGuard)
+@AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
+@AllowedTiers(SubscriptionTierEnum.PRO)
 export class OrganizationInvitesController extends IOrganizationInvitesController {
   public constructor(@Inject(IInvitesService) invitesService: IInvitesService) {
     super(invitesService);
   }
 
   @Post(':slug/invites')
-  @UseGuards(MembershipGuard, RolesGuard)
-  @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
   public async createInvite(
     @Param() params: CreateInviteParamsDTO,
     @Body() body: CreateInviteBodyDTO,
@@ -57,8 +60,6 @@ export class OrganizationInvitesController extends IOrganizationInvitesControlle
   }
 
   @Get(':slug/invites')
-  @UseGuards(MembershipGuard, RolesGuard)
-  @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
   public async getOrganizationInvites(
     @Param() params: GetOrganizationInvitesParamsDTO,
     @Query() pagination: PaginationQueryDTO,
@@ -67,8 +68,6 @@ export class OrganizationInvitesController extends IOrganizationInvitesControlle
   }
 
   @Delete(':slug/invites/:inviteId')
-  @UseGuards(MembershipGuard, RolesGuard)
-  @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   public async revokeInvite(
     @Param() params: RevokeInviteParamsDTO,

@@ -23,6 +23,10 @@ export abstract class IUsersRepository {
     userId: string,
     hashedPassword: string,
   ): Promise<void>;
+  public abstract updateAsaasCustomerId(
+    userId: string,
+    asaasCustomerId: string,
+  ): Promise<void>;
   protected abstract mapToEntity(
     data: Database['public']['Tables']['users']['Row'],
   ): User;

@@ -84,6 +84,23 @@ export class UsersRepository extends IUsersRepository {
     }
   }
 
+  public async updateAsaasCustomerId(
+    userId: string,
+    asaasCustomerId: string,
+  ): Promise<void> {
+    const result = await this.databaseService
+      .from('users')
+      .update({
+        asaas_customer_id: asaasCustomerId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId);
+
+    if (result.error) {
+      throw new DatabaseException();
+    }
+  }
+
   protected mapToEntity(
     data: Database['public']['Tables']['users']['Row'],
   ): User {
@@ -96,6 +113,7 @@ export class UsersRepository extends IUsersRepository {
       data.name,
       data.surname,
       data.hashed_password,
+      data.asaas_customer_id,
       createdAtDate,
       updatedAtDate,
     );

@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { IHelpersService } from '../../helpers/service/i.helpers.service';
+import { ISubscriptionsRepository } from '../../subscriptions/repository/i.subscriptions.repository';
 import { CreateUserBodyDTO } from '../dtos/create-user.dto';
 import {
   GetUserByEmailParamsDTO,
@@ -12,15 +13,18 @@ export abstract class IUsersService {
   protected readonly usersRepository: IUsersRepository;
   protected readonly configService: ConfigService;
   protected readonly helperService: IHelpersService;
+  protected readonly subscriptionsRepository: ISubscriptionsRepository;
 
   public constructor(
     usersRepository: IUsersRepository,
     configService: ConfigService,
     helperService: IHelpersService,
+    subscriptionsRepository: ISubscriptionsRepository,
   ) {
     this.usersRepository = usersRepository;
     this.configService = configService;
     this.helperService = helperService;
+    this.subscriptionsRepository = subscriptionsRepository;
   }
 
   public abstract createUser(body: CreateUserBodyDTO): Promise<User>;

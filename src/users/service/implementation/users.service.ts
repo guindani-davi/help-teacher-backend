@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { IHelpersService } from '../../../helpers/service/i.helpers.service';
+import { ISubscriptionsRepository } from '../../../subscriptions/repository/i.subscriptions.repository';
 import { CreateUserBodyDTO } from '../../dtos/create-user.dto';
 import {
   GetUserByEmailParamsDTO,
@@ -20,8 +21,15 @@ export class UsersService extends IUsersService {
     @Inject(IUsersRepository) usersRepository: IUsersRepository,
     @Inject(ConfigService) configService: ConfigService,
     @Inject(IHelpersService) helperService: IHelpersService,
+    @Inject(ISubscriptionsRepository)
+    subscriptionsRepository: ISubscriptionsRepository,
   ) {
-    super(usersRepository, configService, helperService);
+    super(
+      usersRepository,
+      configService,
+      helperService,
+      subscriptionsRepository,
+    );
   }
 
   public async createUser(body: CreateUserBodyDTO): Promise<User> {
@@ -29,7 +37,11 @@ export class UsersService extends IUsersService {
 
     body.password = hashedPassword;
 
-    return this.usersRepository.createUser(body);
+    const user = await this.usersRepository.createUser(body);
+
+    await this.subscriptionsRepository.createFreeSubscription(user.id);
+
+    return user;
   }
 
   public async getUserById(params: GetUserByIdParamsDTO): Promise<User> {

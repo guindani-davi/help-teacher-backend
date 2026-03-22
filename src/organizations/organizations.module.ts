@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { DatabaseModule } from '../database/database.module';
 import { HelpersModule } from '../helpers/helpers.module';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { OrganizationsController } from './controller/implementation/organizations.controller';
 import { IOrganizationsRepository } from './repository/i.organizations.repository';
 import { OrganizationsRepository } from './repository/implementation/organizations.repository';
@@ -10,7 +11,12 @@ import { OrganizationsService } from './service/implementation/organizations.ser
 
 @Module({
   controllers: [OrganizationsController],
-  imports: [DatabaseModule, HelpersModule, forwardRef(() => AuthModule)],
+  imports: [
+    DatabaseModule,
+    HelpersModule,
+    forwardRef(() => AuthModule),
+    forwardRef(() => SubscriptionsModule),
+  ],
   providers: [
     {
       provide: IOrganizationsRepository,

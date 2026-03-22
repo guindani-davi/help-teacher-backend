@@ -4,6 +4,7 @@ export class User {
   public readonly name: string;
   public readonly surname: string;
   public readonly hashedPassword: string;
+  public readonly asaasCustomerId: string | null;
   public readonly createdAt: Date;
   public readonly updatedAt: Date | null;
 
@@ -13,6 +14,7 @@ export class User {
     name: string,
     surname: string,
     hashedPassword: string,
+    asaasCustomerId: string | null,
     createdAt: Date,
     updatedAt: Date | null,
   ) {
@@ -21,6 +23,7 @@ export class User {
     this.name = name;
     this.surname = surname;
     this.hashedPassword = hashedPassword;
+    this.asaasCustomerId = asaasCustomerId;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }

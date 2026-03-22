@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { DatabaseModule } from '../database/database.module';
 import { EmailModule } from '../email/email.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './controller/implementation/auth.controller';
 import { AuthGuard } from './guards/jwt/jwt.guard';
@@ -25,6 +26,7 @@ import { AuthService } from './service/implementation/auth.service';
     EmailModule,
     DatabaseModule,
     forwardRef(() => OrganizationsModule),
+    forwardRef(() => SubscriptionsModule),
   ],
   providers: [
     {

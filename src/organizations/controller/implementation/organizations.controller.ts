@@ -23,6 +23,9 @@ import { RolesGuard } from '../../../auth/guards/roles/roles.guard';
 import type { JwtPayload } from '../../../auth/payloads/jwt.payload';
 import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../../common/responses/paginated.response';
+import { AllowedTiers } from '../../../subscriptions/decorators/allowed-tiers.decorator';
+import { SubscriptionTierEnum } from '../../../subscriptions/enums/subscription-tier.enum';
+import { SubscriptionTierGuard } from '../../../subscriptions/guards/subscription-tier/subscription-tier.guard';
 import { CreateOrganizationBodyDTO } from '../../dtos/create-organization.dto';
 import { DeleteMemberParamsDTO } from '../../dtos/delete-member.dto';
 import { DeleteOrganizationParamsDTO } from '../../dtos/delete-organization.dto';
@@ -79,8 +82,9 @@ export class OrganizationsController extends IOrganizationsController {
   }
 
   @Put(':slug/members/:memberId')
-  @UseGuards(MembershipGuard, RolesGuard)
+  @UseGuards(MembershipGuard, RolesGuard, SubscriptionTierGuard)
   @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @AllowedTiers(SubscriptionTierEnum.PRO)
   public async updateMember(
     @Param() params: UpdateMemberParamsDTO,
     @Body() body: UpdateMemberBodyDTO,
@@ -96,8 +100,9 @@ export class OrganizationsController extends IOrganizationsController {
   }
 
   @Put(':slug/transfer-ownership/:memberId')
-  @UseGuards(MembershipGuard, RolesGuard)
+  @UseGuards(MembershipGuard, RolesGuard, SubscriptionTierGuard)
   @AllowedRoles(RolesEnum.OWNER)
+  @AllowedTiers(SubscriptionTierEnum.PRO)
   @HttpCode(HttpStatus.OK)
   public async transferOwnership(
     @Param() params: TransferOwnershipParamsDTO,
@@ -121,7 +126,7 @@ export class OrganizationsController extends IOrganizationsController {
 
   @Patch(':slug')
   @UseGuards(MembershipGuard, RolesGuard)
-  @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @AllowedRoles(RolesEnum.OWNER)
   public async updateOrganization(
     @Param() params: UpdateOrganizationBySlugParamsDTO,
     @Body() body: UpdateOrganizationBySlugBodyDTO,
@@ -142,8 +147,9 @@ export class OrganizationsController extends IOrganizationsController {
   }
 
   @Delete(':slug/members/:memberId')
-  @UseGuards(MembershipGuard, RolesGuard)
+  @UseGuards(MembershipGuard, RolesGuard, SubscriptionTierGuard)
   @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
+  @AllowedTiers(SubscriptionTierEnum.PRO)
   @HttpCode(HttpStatus.NO_CONTENT)
   public async deleteMember(
     @Param() params: DeleteMemberParamsDTO,

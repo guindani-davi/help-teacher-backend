@@ -4,6 +4,12 @@ import { JwtPayload } from '../../../auth/payloads/jwt.payload';
 import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../../common/responses/paginated.response';
 import { IHelpersService } from '../../../helpers/service/i.helpers.service';
+import {
+  SubscriptionTierEnum,
+  TIER_HIERARCHY,
+} from '../../../subscriptions/enums/subscription-tier.enum';
+import { InsufficientSubscriptionException } from '../../../subscriptions/exceptions/insufficient-subscription.exception';
+import { ISubscriptionsService } from '../../../subscriptions/service/i.subscriptions.service';
 import { CreateOrganizationBodyDTO } from '../../dtos/create-organization.dto';
 import { DeleteMemberParamsDTO } from '../../dtos/delete-member.dto';
 import { DeleteOrganizationParamsDTO } from '../../dtos/delete-organization.dto';
@@ -27,12 +33,16 @@ import { IOrganizationsService } from '../i.organizations.service';
 
 @Injectable()
 export class OrganizationsService extends IOrganizationsService {
+  private static readonly MINIMUM_OWNER_TIER = SubscriptionTierEnum.FREE;
+
   public constructor(
     @Inject(IOrganizationsRepository)
     organizationsRepository: IOrganizationsRepository,
     @Inject(IHelpersService) helperService: IHelpersService,
+    @Inject(ISubscriptionsService)
+    subscriptionsService: ISubscriptionsService,
   ) {
-    super(organizationsRepository, helperService);
+    super(organizationsRepository, helperService, subscriptionsService);
   }
 
   public async createOrganization(
@@ -168,6 +178,19 @@ export class OrganizationsService extends IOrganizationsService {
     if (targetMembership.isOwner()) {
       throw new ForbiddenOperationException(
         'Target member is already the owner',
+      );
+    }
+
+    const targetTier = await this.subscriptionsService.getUserTier(
+      targetMembership.userId,
+    );
+
+    if (
+      TIER_HIERARCHY[targetTier] <
+      TIER_HIERARCHY[OrganizationsService.MINIMUM_OWNER_TIER]
+    ) {
+      throw new InsufficientSubscriptionException(
+        OrganizationsService.MINIMUM_OWNER_TIER,
       );
     }
 
