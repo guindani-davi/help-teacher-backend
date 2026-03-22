@@ -15,7 +15,9 @@ import { SmtpEmailService } from './service/implementation/smtp-email.service';
         configService: ConfigService,
         helpersService: IHelpersService,
       ) => {
-        if (helpersService.isProduction()) {
+        const provider = configService.get<string>('EMAIL_PROVIDER');
+
+        if (provider === 'resend' || helpersService.isProduction()) {
           return new ResendEmailService(configService);
         }
         return new SmtpEmailService(configService);
