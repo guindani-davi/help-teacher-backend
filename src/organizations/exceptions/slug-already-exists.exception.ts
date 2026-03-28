@@ -6,6 +6,7 @@ export class SlugAlreadyExistsException extends DomainException {
     super(
       'An organization with this name already exists',
       DomainExceptionCode.SLUG_ALREADY_EXISTS,
+      'errors.slugAlreadyExists',
     );
   }
 }

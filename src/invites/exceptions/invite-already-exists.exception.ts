@@ -6,6 +6,7 @@ export class InviteAlreadyExistsException extends DomainException {
     super(
       'A pending invite already exists for this email in this organization',
       DomainExceptionCode.INVITE_ALREADY_EXISTS,
+      'errors.inviteAlreadyExists',
     );
   }
 }

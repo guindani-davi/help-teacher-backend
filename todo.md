@@ -1,0 +1,6 @@
+- review crud
+- comprar dominio, configurar email e deploy
+- tentar related vercel projects com mcp server
+- revisão geral (sec)
+- pentest
+- documentação

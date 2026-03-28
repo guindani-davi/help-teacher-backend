@@ -1,14 +1,17 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class AsaasWebhookEventDTO {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(255)
   public event: string;
 
   @IsOptional()
+  @MaxLength(255)
   public id?: string;
 
   @IsOptional()
+  @MaxLength(255)
   public dateCreated?: string;
 
   @IsOptional()

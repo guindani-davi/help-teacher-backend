@@ -1,13 +1,14 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsUUID, MaxLength } from 'class-validator';
 
 export class GetUserByIdParamsDTO {
   @IsNotEmpty()
-  @IsString()
+  @IsUUID()
   public id: string;
 }
 
 export class GetUserByEmailParamsDTO {
   @IsEmail()
   @IsNotEmpty()
+  @MaxLength(320)
   public email: string;
 }

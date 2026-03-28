@@ -2,10 +2,11 @@ import { DomainExceptionCode } from '../../common/enums/domain-exception-code.en
 import { DomainException } from '../../common/exceptions/domain.exception';
 
 export class DatabaseException extends DomainException {
-  public constructor(message?: string) {
+  public constructor() {
     super(
-      message ?? 'An unexpected database error occurred',
+      'An unexpected database error occurred',
       DomainExceptionCode.DATABASE_ERROR,
+      'errors.databaseError',
     );
   }
 }

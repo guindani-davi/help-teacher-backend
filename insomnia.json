@@ -1,14 +1,14 @@
 {
   "_type": "export",
   "__export_format": 4,
-  "__export_date": "2026-03-15T00:00:00.000Z",
+  "__export_date": "2026-04-02T00:00:00.000Z",
   "__export_source": "insomnia.importers",
   "resources": [
     {
-      "_id": "wrk_help_tutor",
+      "_id": "wrk_help_teacher",
       "_type": "workspace",
-      "name": "Help Tutor Backend",
-      "description": "API collection for Help Tutor Backend",
+      "name": "Help Teacher Backend",
+      "description": "API collection for Help Teacher Backend",
       "scope": "collection",
       "parentId": null
     },
@@ -16,7 +16,7 @@
       "_id": "env_base",
       "_type": "environment",
       "name": "Base Environment",
-      "parentId": "wrk_help_tutor",
+      "parentId": "wrk_help_teacher",
       "data": {
         "base_url": "http://localhost:3000",
         "token": ""
@@ -26,30 +26,150 @@
       "_id": "fld_auth",
       "_type": "request_group",
       "name": "Auth",
-      "parentId": "wrk_help_tutor",
+      "parentId": "wrk_help_teacher",
       "description": "Authentication endpoints"
     },
     {
       "_id": "fld_users",
       "_type": "request_group",
       "name": "Users",
-      "parentId": "wrk_help_tutor",
+      "parentId": "wrk_help_teacher",
       "description": "User management endpoints"
     },
     {
       "_id": "fld_organizations",
       "_type": "request_group",
       "name": "Organizations",
-      "parentId": "wrk_help_tutor",
+      "parentId": "wrk_help_teacher",
       "description": "Organization management endpoints"
     },
     {
       "_id": "fld_memberships",
       "_type": "request_group",
       "name": "Memberships",
-      "parentId": "fld_organizations",
-      "description": "Membership endpoints within organizations"
+      "parentId": "wrk_help_teacher",
+      "description": "Membership endpoints"
     },
+    {
+      "_id": "fld_invites",
+      "_type": "request_group",
+      "name": "Invites",
+      "parentId": "wrk_help_teacher",
+      "description": "Invite management endpoints"
+    },
+    {
+      "_id": "fld_org_invites",
+      "_type": "request_group",
+      "name": "Organization Invites",
+      "parentId": "fld_invites",
+      "description": "Organization-scoped invite endpoints"
+    },
+    {
+      "_id": "fld_user_invites",
+      "_type": "request_group",
+      "name": "User Invites",
+      "parentId": "fld_invites",
+      "description": "User-scoped invite endpoints"
+    },
+    {
+      "_id": "fld_subscriptions",
+      "_type": "request_group",
+      "name": "Subscriptions",
+      "parentId": "wrk_help_teacher",
+      "description": "Subscription management endpoints (trial-based: 7-day trial on first subscription, no FREE tier)"
+    },
+    {
+      "_id": "fld_asaas",
+      "_type": "request_group",
+      "name": "ASAAS Webhooks",
+      "parentId": "wrk_help_teacher",
+      "description": "ASAAS webhook endpoints. Supported events: PAYMENT_CREATED, PAYMENT_CONFIRMED, PAYMENT_RECEIVED, PAYMENT_OVERDUE, SUBSCRIPTION_INACTIVATED, SUBSCRIPTION_DELETED"
+    },
+    {
+      "_id": "fld_education_levels",
+      "_type": "request_group",
+      "name": "Education Levels",
+      "parentId": "wrk_help_teacher",
+      "description": "Education level management endpoints"
+    },
+    {
+      "_id": "fld_grade_levels",
+      "_type": "request_group",
+      "name": "Grade Levels",
+      "parentId": "wrk_help_teacher",
+      "description": "Grade level management endpoints"
+    },
+    {
+      "_id": "fld_schools",
+      "_type": "request_group",
+      "name": "Schools",
+      "parentId": "wrk_help_teacher",
+      "description": "School management endpoints"
+    },
+    {
+      "_id": "fld_students",
+      "_type": "request_group",
+      "name": "Students",
+      "parentId": "wrk_help_teacher",
+      "description": "Student management endpoints"
+    },
+    {
+      "_id": "fld_student_users",
+      "_type": "request_group",
+      "name": "Student-User Links",
+      "parentId": "wrk_help_teacher",
+      "description": "Student-user link management endpoints"
+    },
+    {
+      "_id": "fld_registrations",
+      "_type": "request_group",
+      "name": "Registrations",
+      "parentId": "wrk_help_teacher",
+      "description": "Student registration management endpoints"
+    },
+    {
+      "_id": "fld_schedules",
+      "_type": "request_group",
+      "name": "Schedules",
+      "parentId": "wrk_help_teacher",
+      "description": "Schedule management endpoints"
+    },
+    {
+      "_id": "fld_classes",
+      "_type": "request_group",
+      "name": "Classes",
+      "parentId": "wrk_help_teacher",
+      "description": "Class management endpoints"
+    },
+    {
+      "_id": "fld_topics",
+      "_type": "request_group",
+      "name": "Topics",
+      "parentId": "wrk_help_teacher",
+      "description": "Topic management endpoints"
+    },
+    {
+      "_id": "fld_class_topics",
+      "_type": "request_group",
+      "name": "Class-Topic Links",
+      "parentId": "wrk_help_teacher",
+      "description": "Class-topic link management endpoints"
+    },
+    {
+      "_id": "fld_subjects",
+      "_type": "request_group",
+      "name": "Subjects",
+      "parentId": "wrk_help_teacher",
+      "description": "Subject management endpoints"
+    },
+    {
+      "_id": "fld_reports",
+      "_type": "request_group",
+      "name": "Reports",
+      "parentId": "wrk_help_teacher",
+      "description": "Student report endpoints"
+    },
+
     {
       "_id": "req_login",
       "_type": "request",
@@ -66,42 +186,6 @@
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"your_password\"\n}"
-      }
-    },
-    {
-      "_id": "req_request_password_reset",
-      "_type": "request",
-      "name": "Request Password Reset",
-      "method": "POST",
-      "url": "{{ _.base_url }}/auth/request-password-reset",
-      "parentId": "fld_auth",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"email\": \"user@example.com\"\n}"
-      }
-    },
-    {
-      "_id": "req_reset_password",
-      "_type": "request",
-      "name": "Reset Password",
-      "method": "POST",
-      "url": "{{ _.base_url }}/auth/reset-password",
-      "parentId": "fld_auth",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"token\": \"reset_token_here\",\n  \"newPassword\": \"new_password\"\n}"
       }
     },
     {
@@ -141,6 +225,43 @@
       }
     },
     {
+      "_id": "req_request_password_reset",
+      "_type": "request",
+      "name": "Request Password Reset",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/request-password-reset",
+      "parentId": "fld_auth",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"user@example.com\"\n}"
+      }
+    },
+    {
+      "_id": "req_reset_password",
+      "_type": "request",
+      "name": "Reset Password",
+      "method": "POST",
+      "url": "{{ _.base_url }}/auth/reset-password",
+      "parentId": "fld_auth",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"token\": \"reset_token_here\",\n  \"newPassword\": \"new_password\"\n}"
+      }
+    },
+
+    {
       "_id": "req_create_user",
       "_type": "request",
       "name": "Create User",
@@ -173,6 +294,30 @@
       ],
       "body": {}
     },
+    {
+      "_id": "req_update_me",
+      "_type": "request",
+      "name": "Update Me",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/users/me",
+      "parentId": "fld_users",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"locale\": \"pt-BR\",\n  \"password\": \"new_password\",\n  \"currentPassword\": \"current_password\"\n}"
+      },
+      "description": "Update current user. At least one of 'locale' or 'password' must be provided. If 'password' is set, 'currentPassword' is required."
+    },
+
     {
       "_id": "req_create_organization",
       "_type": "request",
@@ -248,11 +393,36 @@
       "body": {}
     },
     {
+      "_id": "req_upload_logo",
+      "_type": "request",
+      "name": "Upload Logo",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/organizations/my-organization/logo",
+      "parentId": "fld_organizations",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "multipart/form-data",
+        "params": [
+          {
+            "name": "file",
+            "type": "file",
+            "fileName": ""
+          }
+        ]
+      }
+    },
+
+    {
       "_id": "req_get_membership",
       "_type": "request",
       "name": "Get My Membership",
       "method": "GET",
-      "url": "{{ _.base_url }}/organizations/my-organization/membership",
+      "url": "{{ _.base_url }}/memberships/my-organization",
       "parentId": "fld_memberships",
       "headers": [
         {
@@ -267,12 +437,22 @@
       "_type": "request",
       "name": "Get Members",
       "method": "GET",
-      "url": "{{ _.base_url }}/organizations/my-organization/members",
+      "url": "{{ _.base_url }}/memberships/my-organization/members",
       "parentId": "fld_memberships",
       "headers": [
         {
           "name": "Authorization",
           "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
         }
       ],
       "body": {}
@@ -282,7 +462,7 @@
       "_type": "request",
       "name": "Update Member",
       "method": "PUT",
-      "url": "{{ _.base_url }}/organizations/my-organization/members/MEMBER_UUID_HERE",
+      "url": "{{ _.base_url }}/memberships/my-organization/members/MEMBER_UUID_HERE",
       "parentId": "fld_memberships",
       "headers": [
         {
@@ -300,26 +480,11 @@
       }
     },
     {
-      "_id": "req_delete_member",
-      "_type": "request",
-      "name": "Delete Member",
-      "method": "DELETE",
-      "url": "{{ _.base_url }}/organizations/my-organization/members/MEMBER_UUID_HERE",
-      "parentId": "fld_memberships",
-      "headers": [
-        {
-          "name": "Authorization",
-          "value": "Bearer {{ _.token }}"
-        }
-      ],
-      "body": {}
-    },
-    {
       "_id": "req_transfer_ownership",
       "_type": "request",
       "name": "Transfer Ownership",
       "method": "PUT",
-      "url": "{{ _.base_url }}/organizations/my-organization/transfer-ownership/MEMBER_UUID_HERE",
+      "url": "{{ _.base_url }}/memberships/my-organization/transfer-ownership/MEMBER_UUID_HERE",
       "parentId": "fld_memberships",
       "headers": [
         {
@@ -330,26 +495,21 @@
       "body": {}
     },
     {
-      "_id": "fld_invites",
-      "_type": "request_group",
-      "name": "Invites",
-      "parentId": "wrk_help_tutor",
-      "description": "Invite management endpoints"
+      "_id": "req_delete_member",
+      "_type": "request",
+      "name": "Delete Member",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/memberships/my-organization/members/MEMBER_UUID_HERE",
+      "parentId": "fld_memberships",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
     },
-    {
-      "_id": "fld_org_invites",
-      "_type": "request_group",
-      "name": "Organization Invites",
-      "parentId": "fld_invites",
-      "description": "Organization-scoped invite endpoints"
-    },
-    {
-      "_id": "fld_user_invites",
-      "_type": "request_group",
-      "name": "User Invites",
-      "parentId": "fld_invites",
-      "description": "User-scoped invite endpoints"
-    },
+
     {
       "_id": "req_create_invite",
       "_type": "request",
@@ -385,6 +545,16 @@
           "value": "Bearer {{ _.token }}"
         }
       ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
       "body": {}
     },
     {
@@ -413,6 +583,16 @@
         {
           "name": "Authorization",
           "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
         }
       ],
       "body": {}
@@ -462,13 +642,7 @@
       ],
       "body": {}
     },
-    {
-      "_id": "fld_subscriptions",
-      "_type": "request_group",
-      "name": "Subscriptions",
-      "parentId": "wrk_help_tutor",
-      "description": "Subscription management endpoints"
-    },
+
     {
       "_id": "req_get_plans",
       "_type": "request",
@@ -517,19 +691,69 @@
       }
     },
     {
-      "_id": "fld_asaas",
-      "_type": "request_group",
-      "name": "ASAAS Webhooks",
-      "parentId": "wrk_help_tutor",
-      "description": "ASAAS webhook endpoints"
+      "_id": "req_cancel_subscription",
+      "_type": "request",
+      "name": "Cancel Subscription",
+      "method": "POST",
+      "url": "{{ _.base_url }}/subscriptions/cancel",
+      "parentId": "fld_subscriptions",
+      "description": "Schedule subscription cancellation at the end of the current billing period. User keeps access until then.",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
     },
     {
-      "_id": "req_asaas_webhook",
+      "_id": "req_reactivate_subscription",
       "_type": "request",
-      "name": "ASAAS Webhook",
+      "name": "Reactivate Subscription",
+      "method": "POST",
+      "url": "{{ _.base_url }}/subscriptions/reactivate",
+      "parentId": "fld_subscriptions",
+      "description": "Undo a pending cancellation. Restores the subscription so it continues renewing normally.",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+
+    {
+      "_id": "req_asaas_webhook_payment_created",
+      "_type": "request",
+      "name": "Webhook - PAYMENT_CREATED",
       "method": "POST",
       "url": "{{ _.base_url }}/asaas/webhooks",
       "parentId": "fld_asaas",
+      "description": "Fired when ASAAS creates the first payment after checkout. Stores the ASAAS subscription ID on the user subscription.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "asaas-access-token",
+          "value": "YOUR_WEBHOOK_TOKEN_HERE"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event\": \"PAYMENT_CREATED\",\n  \"payment\": {\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
+      }
+    },
+    {
+      "_id": "req_asaas_webhook_payment_confirmed",
+      "_type": "request",
+      "name": "Webhook - PAYMENT_CONFIRMED",
+      "method": "POST",
+      "url": "{{ _.base_url }}/asaas/webhooks",
+      "parentId": "fld_asaas",
+      "description": "Fired when a payment is confirmed. Transitions TRIALING to ACTIVE, applies pending plan changes.",
       "headers": [
         {
           "name": "Content-Type",
@@ -544,6 +768,1125 @@
         "mimeType": "application/json",
         "text": "{\n  \"event\": \"PAYMENT_CONFIRMED\",\n  \"payment\": {\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
       }
+    },
+    {
+      "_id": "req_asaas_webhook_payment_overdue",
+      "_type": "request",
+      "name": "Webhook - PAYMENT_OVERDUE",
+      "method": "POST",
+      "url": "{{ _.base_url }}/asaas/webhooks",
+      "parentId": "fld_asaas",
+      "description": "Fired when a payment becomes overdue. Sets subscription status to PAST_DUE (org features blocked).",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "asaas-access-token",
+          "value": "YOUR_WEBHOOK_TOKEN_HERE"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event\": \"PAYMENT_OVERDUE\",\n  \"payment\": {\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
+      }
+    },
+    {
+      "_id": "req_asaas_webhook_subscription_canceled",
+      "_type": "request",
+      "name": "Webhook - SUBSCRIPTION_INACTIVATED",
+      "method": "POST",
+      "url": "{{ _.base_url }}/asaas/webhooks",
+      "parentId": "fld_asaas",
+      "description": "Fired when a subscription is canceled/inactivated in ASAAS. Sets status to CANCELED.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "asaas-access-token",
+          "value": "YOUR_WEBHOOK_TOKEN_HERE"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event\": \"SUBSCRIPTION_INACTIVATED\",\n  \"payment\": {\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
+      }
+    },
+
+    {
+      "_id": "req_create_education_level",
+      "_type": "request",
+      "name": "Create Education Level",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/education-levels",
+      "parentId": "fld_education_levels",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Elementary School\"\n}"
+      }
+    },
+    {
+      "_id": "req_get_education_levels",
+      "_type": "request",
+      "name": "Get Education Levels",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/education-levels",
+      "parentId": "fld_education_levels",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_education_level_by_id",
+      "_type": "request",
+      "name": "Get Education Level by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/education-levels/EDUCATION_LEVEL_UUID_HERE",
+      "parentId": "fld_education_levels",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_education_level",
+      "_type": "request",
+      "name": "Update Education Level",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/organizations/my-organization/education-levels/EDUCATION_LEVEL_UUID_HERE",
+      "parentId": "fld_education_levels",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Updated Education Level\"\n}"
+      }
+    },
+    {
+      "_id": "req_delete_education_level",
+      "_type": "request",
+      "name": "Delete Education Level",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/education-levels/EDUCATION_LEVEL_UUID_HERE",
+      "parentId": "fld_education_levels",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+
+    {
+      "_id": "req_create_grade_level",
+      "_type": "request",
+      "name": "Create Grade Level",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/education-levels/EDUCATION_LEVEL_UUID_HERE/grade-levels",
+      "parentId": "fld_grade_levels",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"1st Grade\"\n}"
+      }
+    },
+    {
+      "_id": "req_get_grade_levels",
+      "_type": "request",
+      "name": "Get Grade Levels",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/education-levels/EDUCATION_LEVEL_UUID_HERE/grade-levels",
+      "parentId": "fld_grade_levels",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_grade_level_by_id",
+      "_type": "request",
+      "name": "Get Grade Level by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/education-levels/EDUCATION_LEVEL_UUID_HERE/grade-levels/GRADE_LEVEL_UUID_HERE",
+      "parentId": "fld_grade_levels",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_grade_level",
+      "_type": "request",
+      "name": "Update Grade Level",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/organizations/my-organization/education-levels/EDUCATION_LEVEL_UUID_HERE/grade-levels/GRADE_LEVEL_UUID_HERE",
+      "parentId": "fld_grade_levels",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Updated Grade Level\"\n}"
+      }
+    },
+    {
+      "_id": "req_delete_grade_level",
+      "_type": "request",
+      "name": "Delete Grade Level",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/education-levels/EDUCATION_LEVEL_UUID_HERE/grade-levels/GRADE_LEVEL_UUID_HERE",
+      "parentId": "fld_grade_levels",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+
+    {
+      "_id": "req_create_school",
+      "_type": "request",
+      "name": "Create School",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/schools",
+      "parentId": "fld_schools",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Lincoln High School\"\n}"
+      }
+    },
+    {
+      "_id": "req_get_schools",
+      "_type": "request",
+      "name": "Get Schools",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/schools",
+      "parentId": "fld_schools",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_school_by_id",
+      "_type": "request",
+      "name": "Get School by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/schools/SCHOOL_UUID_HERE",
+      "parentId": "fld_schools",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_school",
+      "_type": "request",
+      "name": "Update School",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/organizations/my-organization/schools/SCHOOL_UUID_HERE",
+      "parentId": "fld_schools",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Updated School Name\"\n}"
+      }
+    },
+    {
+      "_id": "req_delete_school",
+      "_type": "request",
+      "name": "Delete School",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/schools/SCHOOL_UUID_HERE",
+      "parentId": "fld_schools",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+
+    {
+      "_id": "req_create_student",
+      "_type": "request",
+      "name": "Create Student",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/students",
+      "parentId": "fld_students",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"John\",\n  \"surname\": \"Doe\"\n}"
+      }
+    },
+    {
+      "_id": "req_get_students",
+      "_type": "request",
+      "name": "Get Students",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/students",
+      "parentId": "fld_students",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_my_students",
+      "_type": "request",
+      "name": "Get My Students",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/students/my-students",
+      "parentId": "fld_students",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_student_by_id",
+      "_type": "request",
+      "name": "Get Student by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/students/STUDENT_UUID_HERE",
+      "parentId": "fld_students",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_student",
+      "_type": "request",
+      "name": "Update Student",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/organizations/my-organization/students/STUDENT_UUID_HERE",
+      "parentId": "fld_students",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Jane\",\n  \"surname\": \"Smith\"\n}"
+      }
+    },
+    {
+      "_id": "req_delete_student",
+      "_type": "request",
+      "name": "Delete Student",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/students/STUDENT_UUID_HERE",
+      "parentId": "fld_students",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_link_student_user",
+      "_type": "request",
+      "name": "Link Student to User",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/students/STUDENT_UUID_HERE/users",
+      "parentId": "fld_student_users",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"userId\": \"USER_UUID_HERE\"\n}"
+      }
+    },
+    {
+      "_id": "req_unlink_student_user",
+      "_type": "request",
+      "name": "Unlink Student from User",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/students/STUDENT_UUID_HERE/users/STUDENT_USER_UUID_HERE",
+      "parentId": "fld_student_users",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+
+    {
+      "_id": "req_create_registration",
+      "_type": "request",
+      "name": "Create Registration",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/registrations",
+      "parentId": "fld_registrations",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"studentId\": \"STUDENT_UUID_HERE\",\n  \"schoolId\": \"SCHOOL_UUID_HERE\",\n  \"gradeLevelId\": \"GRADE_LEVEL_UUID_HERE\",\n  \"startDate\": \"2026-03-01\",\n  \"endDate\": \"2026-12-15\"\n}"
+      }
+    },
+    {
+      "_id": "req_get_registrations",
+      "_type": "request",
+      "name": "Get Registrations",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/registrations",
+      "parentId": "fld_registrations",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_registration_by_id",
+      "_type": "request",
+      "name": "Get Registration by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/registrations/REGISTRATION_UUID_HERE",
+      "parentId": "fld_registrations",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_registration",
+      "_type": "request",
+      "name": "Update Registration",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/organizations/my-organization/registrations/REGISTRATION_UUID_HERE",
+      "parentId": "fld_registrations",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"studentId\": \"STUDENT_UUID_HERE\",\n  \"schoolId\": \"SCHOOL_UUID_HERE\",\n  \"gradeLevelId\": \"GRADE_LEVEL_UUID_HERE\",\n  \"startDate\": \"2026-03-01\",\n  \"endDate\": \"2026-12-15\"\n}"
+      }
+    },
+    {
+      "_id": "req_delete_registration",
+      "_type": "request",
+      "name": "Delete Registration",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/registrations/REGISTRATION_UUID_HERE",
+      "parentId": "fld_registrations",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+
+    {
+      "_id": "req_create_schedule",
+      "_type": "request",
+      "name": "Create Schedule",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/schedules",
+      "parentId": "fld_schedules",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"dayOfWeek\": \"monday\",\n  \"startTime\": \"08:00\",\n  \"endTime\": \"09:30\"\n}"
+      }
+    },
+    {
+      "_id": "req_get_schedules",
+      "_type": "request",
+      "name": "Get Schedules",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/schedules",
+      "parentId": "fld_schedules",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_schedule_by_id",
+      "_type": "request",
+      "name": "Get Schedule by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/schedules/SCHEDULE_UUID_HERE",
+      "parentId": "fld_schedules",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_schedule",
+      "_type": "request",
+      "name": "Update Schedule",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/organizations/my-organization/schedules/SCHEDULE_UUID_HERE",
+      "parentId": "fld_schedules",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"dayOfWeek\": \"wednesday\",\n  \"startTime\": \"10:00\",\n  \"endTime\": \"11:30\"\n}"
+      }
+    },
+    {
+      "_id": "req_delete_schedule",
+      "_type": "request",
+      "name": "Delete Schedule",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/schedules/SCHEDULE_UUID_HERE",
+      "parentId": "fld_schedules",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+
+    {
+      "_id": "req_create_class",
+      "_type": "request",
+      "name": "Create Class",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/classes",
+      "parentId": "fld_classes",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"scheduleId\": \"SCHEDULE_UUID_HERE\",\n  \"studentId\": \"STUDENT_UUID_HERE\",\n  \"teacherId\": \"MEMBER_UUID_HERE\",\n  \"date\": \"2026-04-01\"\n}"
+      }
+    },
+    {
+      "_id": "req_get_classes",
+      "_type": "request",
+      "name": "Get Classes",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/classes",
+      "parentId": "fld_classes",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_class_by_id",
+      "_type": "request",
+      "name": "Get Class by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/classes/CLASS_UUID_HERE",
+      "parentId": "fld_classes",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_class",
+      "_type": "request",
+      "name": "Update Class",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/organizations/my-organization/classes/CLASS_UUID_HERE",
+      "parentId": "fld_classes",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"scheduleId\": \"SCHEDULE_UUID_HERE\",\n  \"studentId\": \"STUDENT_UUID_HERE\",\n  \"teacherId\": \"MEMBER_UUID_HERE\",\n  \"date\": \"2026-04-01\"\n}"
+      }
+    },
+    {
+      "_id": "req_delete_class",
+      "_type": "request",
+      "name": "Delete Class",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/classes/CLASS_UUID_HERE",
+      "parentId": "fld_classes",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+
+    {
+      "_id": "req_create_topic",
+      "_type": "request",
+      "name": "Create Topic",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/topics",
+      "parentId": "fld_topics",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Algebra\",\n  \"subjectId\": \"SUBJECT_UUID_HERE\"\n}"
+      }
+    },
+    {
+      "_id": "req_get_topics",
+      "_type": "request",
+      "name": "Get Topics",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/topics",
+      "parentId": "fld_topics",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_topic_by_id",
+      "_type": "request",
+      "name": "Get Topic by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/topics/TOPIC_UUID_HERE",
+      "parentId": "fld_topics",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_topic",
+      "_type": "request",
+      "name": "Update Topic",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/organizations/my-organization/topics/TOPIC_UUID_HERE",
+      "parentId": "fld_topics",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Advanced Algebra\",\n  \"subjectId\": \"SUBJECT_UUID_HERE\"\n}"
+      }
+    },
+    {
+      "_id": "req_delete_topic",
+      "_type": "request",
+      "name": "Delete Topic",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/topics/TOPIC_UUID_HERE",
+      "parentId": "fld_topics",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_class_topics",
+      "_type": "request",
+      "name": "Get Class Topics",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/classes/CLASS_UUID_HERE/topics",
+      "parentId": "fld_class_topics",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_link_class_topic",
+      "_type": "request",
+      "name": "Link Topic to Class",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/classes/CLASS_UUID_HERE/topics",
+      "parentId": "fld_class_topics",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"topicId\": \"TOPIC_UUID_HERE\"\n}"
+      }
+    },
+    {
+      "_id": "req_unlink_class_topic",
+      "_type": "request",
+      "name": "Unlink Topic from Class",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/classes/CLASS_UUID_HERE/topics/CLASS_TOPIC_UUID_HERE",
+      "parentId": "fld_class_topics",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+
+    {
+      "_id": "req_create_subject",
+      "_type": "request",
+      "name": "Create Subject",
+      "method": "POST",
+      "url": "{{ _.base_url }}/organizations/my-organization/subjects",
+      "parentId": "fld_subjects",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Mathematics\"\n}"
+      }
+    },
+    {
+      "_id": "req_get_subjects",
+      "_type": "request",
+      "name": "Get Subjects",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/subjects",
+      "parentId": "fld_subjects",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_subject_by_id",
+      "_type": "request",
+      "name": "Get Subject by ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/subjects/SUBJECT_UUID_HERE",
+      "parentId": "fld_subjects",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_update_subject",
+      "_type": "request",
+      "name": "Update Subject",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/organizations/my-organization/subjects/SUBJECT_UUID_HERE",
+      "parentId": "fld_subjects",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Updated Subject\"\n}"
+      }
+    },
+    {
+      "_id": "req_delete_subject",
+      "_type": "request",
+      "name": "Delete Subject",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/organizations/my-organization/subjects/SUBJECT_UUID_HERE",
+      "parentId": "fld_subjects",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+
+    {
+      "_id": "req_get_student_report",
+      "_type": "request",
+      "name": "Get Student Report (JSON)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/reports/students/STUDENT_UUID_HERE",
+      "parentId": "fld_reports",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_student_report_pdf",
+      "_type": "request",
+      "name": "Get Student Report (PDF)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/reports/students/STUDENT_UUID_HERE/pdf",
+      "parentId": "fld_reports",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "fld_status",
+      "_type": "request_group",
+      "name": "Status",
+      "parentId": "wrk_help_teacher",
+      "description": "Health check endpoint (public, no auth required)"
+    },
+    {
+      "_id": "req_get_status",
+      "_type": "request",
+      "name": "Get Status",
+      "method": "GET",
+      "url": "{{ _.base_url }}/status",
+      "parentId": "fld_status",
+      "headers": [],
+      "body": {},
+      "description": "Returns API health status including version, environment, Node.js version, overall status (healthy/degraded/unhealthy), and dependency checks (database, storage, payments, email). No authentication required."
     }
   ]
 }

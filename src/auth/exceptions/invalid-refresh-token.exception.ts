@@ -6,6 +6,7 @@ export class InvalidRefreshTokenException extends DomainException {
     super(
       'Invalid or expired refresh token',
       DomainExceptionCode.INVALID_REFRESH_TOKEN,
+      'errors.invalidRefreshToken',
     );
   }
 }

@@ -6,10 +6,12 @@ import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { II18nService } from './i18n/services/i.i18n.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const i18nService = app.get(II18nService);
 
   app.use(helmet());
 
@@ -26,7 +28,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalFilters(new AllExceptionsFilter(i18nService));
   app.useGlobalInterceptors(
     new LoggingInterceptor(),
     new ResponseInterceptor(),

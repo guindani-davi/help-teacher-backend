@@ -6,6 +6,7 @@ export class InvalidResetTokenException extends DomainException {
     super(
       'Invalid or expired reset token',
       DomainExceptionCode.INVALID_RESET_TOKEN,
+      'errors.invalidResetToken',
     );
   }
 }
