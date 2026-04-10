@@ -1,7 +1,6 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
-import { InvalidCredentialsException } from 'src/auth/exceptions/invalid-credentials.exception';
 import { EntityNotFoundException } from '../../../common/exceptions/entity-not-found.exception';
 import { IDatabaseService } from '../../../database/services/i.database.service';
 import { IEmailService } from '../../../email/services/i.email.service';
@@ -10,6 +9,7 @@ import { LoginDTO } from '../../dtos/login.dto';
 import { RefreshTokenDTO } from '../../dtos/refresh-token.dto';
 import { RequestPasswordResetDTO } from '../../dtos/request-password-reset.dto';
 import { ResetPasswordDTO } from '../../dtos/reset-password.dto';
+import { InvalidCredentialsException } from '../../exceptions/invalid-credentials.exception';
 import { InvalidRefreshTokenException } from '../../exceptions/invalid-refresh-token.exception';
 import { InvalidResetTokenException } from '../../exceptions/invalid-reset-token.exception';
 import { AuthTokensResponse } from '../../models/auth-tokens-response.model';
@@ -22,7 +22,7 @@ export class AuthService extends IAuthService {
   private readonly logger: Logger;
 
   public constructor(
-    @Inject(IUsersService) userService: IUsersService,
+    @Inject(forwardRef(() => IUsersService)) userService: IUsersService,
     @Inject(JwtService) jwtService: JwtService,
     @Inject(IEmailService) emailService: IEmailService,
     @Inject(IDatabaseService) databaseService: IDatabaseService,

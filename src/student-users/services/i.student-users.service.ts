@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { IMembershipsService } from 'src/memberships/services/i.memberships.service';
-import { IStudentsService } from 'src/students/services/i.students.service';
 import type { JwtPayload } from '../../auth/models/jwt.model';
 import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../common/models/paginated-response.model';
 import type { Membership } from '../../memberships/models/membership.model';
+import { IMembershipsService } from '../../memberships/services/i.memberships.service';
 import { Student } from '../../students/models/student.model';
+import { IStudentsService } from '../../students/services/i.students.service';
 import { LinkStudentUserBodyDTO } from '../dtos/link-student-user.dto';
 import { UnlinkStudentUserParamsDTO } from '../dtos/unlink-student-user.dto';
 import { StudentUser } from '../models/student-user.model';

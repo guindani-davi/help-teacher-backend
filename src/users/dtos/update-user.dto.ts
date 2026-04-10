@@ -7,8 +7,8 @@ import {
   MinLength,
   ValidateIf,
 } from 'class-validator';
+import { AtLeastOneField } from '../../common/validators/at-least-one-field.validator';
 import { LocaleEnum } from '../../i18n/enums/locale.enum';
-import { AtLeastOneField } from '../validators/at-least-one-field.validator';
 
 @AtLeastOneField(['locale', 'password'])
 export class UpdateUserBodyDTO {

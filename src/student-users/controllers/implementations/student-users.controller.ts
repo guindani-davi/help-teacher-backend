@@ -15,11 +15,11 @@ import { CurrentMembership } from '../../../auth/decorators/current-membership.d
 import { CurrentUser } from '../../../auth/decorators/current-user.decorator';
 import { AllowedRoles } from '../../../auth/decorators/roles.decorator';
 import { RolesEnum } from '../../../auth/enums/roles.enum';
-import { MembershipGuard } from '../../../auth/guards/membership.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import type { JwtPayload } from '../../../auth/models/jwt.model';
 import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../../common/models/paginated-response.model';
+import { MembershipGuard } from '../../../memberships/guards/membership.guard';
 import type { Membership } from '../../../memberships/models/membership.model';
 import { Student } from '../../../students/models/student.model';
 import { ActiveSubscriptionGuard } from '../../../subscriptions/guards/active-subscription.guard';
@@ -31,6 +31,7 @@ import { IStudentUsersController } from '../i.student-users.controller';
 
 @Controller('organizations')
 @UseGuards(MembershipGuard, RolesGuard, ActiveSubscriptionGuard)
+@AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
 export class StudentUsersController extends IStudentUsersController {
   public constructor(
     @Inject(IStudentUsersService) studentUsersService: IStudentUsersService,
@@ -49,7 +50,6 @@ export class StudentUsersController extends IStudentUsersController {
   }
 
   @Post(':slug/students/:studentId/users')
-  @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
   public async create(
     @Param('studentId') studentId: string,
     @Body() body: LinkStudentUserBodyDTO,
@@ -60,7 +60,6 @@ export class StudentUsersController extends IStudentUsersController {
   }
 
   @Delete(':slug/students/:studentId/users/:studentUserId')
-  @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   public async delete(
     @Param() params: UnlinkStudentUserParamsDTO,

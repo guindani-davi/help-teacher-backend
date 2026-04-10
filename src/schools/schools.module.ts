@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { DatabaseModule } from '../database/database.module';
 import { HelpersModule } from '../helpers/helpers.module';
+import { MembershipsModule } from '../memberships/memberships.module';
 import { RegistrationsModule } from '../registrations/registrations.module';
 import { ReportsModule } from '../reports/reports.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
@@ -17,6 +18,7 @@ import { SchoolsService } from './services/implementations/schools.service';
     DatabaseModule,
     HelpersModule,
     forwardRef(() => AuthModule),
+    forwardRef(() => MembershipsModule),
     forwardRef(() => SubscriptionsModule),
     forwardRef(() => RegistrationsModule),
     forwardRef(() => ReportsModule),

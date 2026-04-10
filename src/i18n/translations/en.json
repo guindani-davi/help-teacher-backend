@@ -12,6 +12,7 @@
     "inviteExpired": "This invite has expired",
     "insufficientSubscription": "This action requires at least a {requiredTier} subscription. If you are not the organization owner, please contact them to upgrade.",
     "subscriptionRequired": "An active subscription is required to perform this action. If you are not the organization owner, please contact them to subscribe.",
+    "userSubscriptionRequired": "An active subscription is required to perform this action. Please subscribe to a plan to continue.",
     "subscriptionAlreadyCanceling": "Subscription is already scheduled for cancellation at the end of the current period",
     "subscriptionNotCanceling": "Subscription is not pending cancellation",
     "subscriptionCancelNotAllowed": "Cannot cancel subscription in its current state",
@@ -38,7 +39,8 @@
     "studentUserNotLinked": "Student-user link does not belong to this student",
     "noAccessToStudent": "You do not have access to this student",
     "teacherNotInOrganization": "Teacher is not a member of this organization",
-    "registrationOverlap": "Student already has a registration that overlaps with the given date range"
+    "registrationOverlap": "Student already has a registration that overlaps with the given date range",
+    "organizationLimitReached": "You have reached the maximum number of organizations for your current plan. Please upgrade to Pro or delete an existing organization."
   },
   "emails": {
     "passwordReset": {

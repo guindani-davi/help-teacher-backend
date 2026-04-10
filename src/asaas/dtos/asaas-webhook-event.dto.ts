@@ -16,6 +16,7 @@ export class AsaasWebhookEventDTO {
 
   @IsOptional()
   public payment?: {
+    id?: string;
     subscription?: string;
     customer?: string;
     externalReference?: string;

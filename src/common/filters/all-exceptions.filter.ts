@@ -46,6 +46,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     [DomainExceptionCode.SUBSCRIPTION_INVALID_STATE, HttpStatus.CONFLICT],
     [DomainExceptionCode.ASAAS_API_ERROR, HttpStatus.BAD_GATEWAY],
     [DomainExceptionCode.REGISTRATION_OVERLAP, HttpStatus.CONFLICT],
+    [DomainExceptionCode.ORGANIZATION_LIMIT_REACHED, HttpStatus.FORBIDDEN],
   ]);
 
   public catch(exception: unknown, host: ArgumentsHost): void {

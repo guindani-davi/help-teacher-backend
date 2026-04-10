@@ -1,10 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AsaasApiException } from 'src/asaas/exceptions/asaas-api.exception';
-import { AsaasCheckoutSession } from 'src/asaas/models/asaas-checkout-session.model';
-import { AsaasSubscription } from 'src/asaas/models/asaas-subscription.model';
 import { CreateCheckoutSessionParamsDTO } from '../../dtos/create-checkout-session-params.dto';
+import { CreatePaymentParamsDTO } from '../../dtos/create-payment-params.dto';
 import { UpdateAsaasSubscriptionParamsDTO } from '../../dtos/update-asaas-subscription-params.dto';
+import { AsaasApiException } from '../../exceptions/asaas-api.exception';
+import { AsaasCheckoutSession } from '../../models/asaas-checkout-session.model';
+import { AsaasPayment } from '../../models/asaas-payment.model';
+import { AsaasSubscription } from '../../models/asaas-subscription.model';
 import { IAsaasService } from '../i.asaas.service';
 
 @Injectable()
@@ -107,7 +109,42 @@ export class AsaasService extends IAsaasService {
     );
   }
 
-  protected async request<T>(
+  public async createPayment(
+    params: CreatePaymentParamsDTO,
+  ): Promise<AsaasPayment> {
+    const body = {
+      customer: params.customer,
+      billingType: params.billingType,
+      value: params.value,
+      dueDate: params.dueDate,
+      description: params.description,
+      externalReference: params.externalReference,
+    };
+
+    const response = await this.request<{
+      id: string;
+      customer: string;
+      value: number;
+      status: string;
+      invoiceUrl: string;
+      externalReference: string | null;
+    }>('POST', '/v3/payments', body);
+
+    return new AsaasPayment(
+      response.id,
+      response.customer,
+      response.value,
+      response.status,
+      response.invoiceUrl,
+      response.externalReference,
+    );
+  }
+
+  public async deletePayment(asaasPaymentId: string): Promise<void> {
+    await this.request<unknown>('DELETE', `/v3/payments/${asaasPaymentId}`);
+  }
+
+  private async request<T>(
     method: string,
     path: string,
     body?: unknown,

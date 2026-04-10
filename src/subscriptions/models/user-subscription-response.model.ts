@@ -9,6 +9,7 @@ export class UserSubscriptionResponse {
   public readonly pendingPlan: SubscriptionPlanResponse | null;
   public readonly trialEndsAt: string | null;
   public readonly currentPeriodEnd: string | null;
+  public readonly prorationAsaasPaymentId: string | null;
   public readonly cancelAtPeriodEnd: boolean;
   public readonly canceledAt: string | null;
 
@@ -28,6 +29,7 @@ export class UserSubscriptionResponse {
     this.currentPeriodEnd = subscription.currentPeriodEnd
       ? subscription.currentPeriodEnd.toISOString()
       : null;
+    this.prorationAsaasPaymentId = subscription.prorationAsaasPaymentId;
     this.cancelAtPeriodEnd = subscription.cancelAtPeriodEnd;
     this.canceledAt = subscription.canceledAt
       ? subscription.canceledAt.toISOString()

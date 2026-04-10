@@ -2,6 +2,7 @@ import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../common/models/paginated-response.model';
 import { IDatabaseService } from '../../database/services/i.database.service';
 import { IHelpersService } from '../../helpers/services/i.helpers.service';
+import { StudentDetail } from '../models/student-detail.model';
 import { Student } from '../models/student.model';
 
 export abstract class IStudentsRepository {
@@ -26,6 +27,10 @@ export abstract class IStudentsRepository {
     studentId: string,
     organizationId: string,
   ): Promise<Student>;
+  public abstract getDetailById(
+    studentId: string,
+    organizationId: string,
+  ): Promise<StudentDetail>;
   public abstract getByOrganizationId(
     organizationId: string,
     pagination: PaginationQueryDTO,

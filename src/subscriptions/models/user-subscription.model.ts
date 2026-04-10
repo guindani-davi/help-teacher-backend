@@ -9,6 +9,7 @@ export class UserSubscription {
   public readonly pendingPlanId: string | null;
   public readonly trialEndsAt: Date | null;
   public readonly currentPeriodEnd: Date | null;
+  public readonly prorationAsaasPaymentId: string | null;
   public readonly cancelAtPeriodEnd: boolean;
   public readonly canceledAt: Date | null;
   public readonly createdAt: Date;
@@ -23,6 +24,7 @@ export class UserSubscription {
     pendingPlanId: string | null,
     trialEndsAt: Date | null,
     currentPeriodEnd: Date | null,
+    prorationAsaasPaymentId: string | null,
     cancelAtPeriodEnd: boolean,
     canceledAt: Date | null,
     createdAt: Date,
@@ -36,6 +38,7 @@ export class UserSubscription {
     this.pendingPlanId = pendingPlanId;
     this.trialEndsAt = trialEndsAt;
     this.currentPeriodEnd = currentPeriodEnd;
+    this.prorationAsaasPaymentId = prorationAsaasPaymentId;
     this.cancelAtPeriodEnd = cancelAtPeriodEnd;
     this.canceledAt = canceledAt;
     this.createdAt = createdAt;

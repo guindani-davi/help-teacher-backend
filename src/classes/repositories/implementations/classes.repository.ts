@@ -6,6 +6,7 @@ import { DatabaseException } from '../../../database/exceptions/database.excepti
 import { IDatabaseService } from '../../../database/services/i.database.service';
 import { Database } from '../../../database/types';
 import { IHelpersService } from '../../../helpers/services/i.helpers.service';
+import { ClassDetail } from '../../models/class-detail.model';
 import { Class } from '../../models/class.model';
 import { IClassesRepository } from '../i.classes.repository';
 
@@ -206,6 +207,84 @@ export class ClassesRepository extends IClassesRepository {
     return result.data?.map((row) => row.id) ?? [];
   }
 
+  public async getDetailById(
+    classId: string,
+    organizationId: string,
+  ): Promise<ClassDetail> {
+    const result = await this.databaseService
+      .from('classes')
+      .select(
+        `
+        id, date,
+        students(id, name, surname),
+        schedules(id, day_of_week, start_time, end_time),
+        users!classes_teacher_id_fkey(id, name, surname),
+        class_topics(
+          topics(id, name,
+            subjects(id, name)
+          )
+        )
+      `,
+      )
+      .eq('id', classId)
+      .eq('organization_id', organizationId)
+      .eq('is_active', true)
+      .eq('class_topics.is_active', true)
+      .single();
+
+    if (!result.data) {
+      throw new EntityNotFoundException('Class');
+    }
+
+    return this.mapToClassDetail(result.data);
+  }
+
+  public async getByStudentId(
+    studentId: string,
+    organizationId: string,
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<ClassDetail>> {
+    const { from, to } = pagination.getRange();
+
+    const result = await this.databaseService
+      .from('classes')
+      .select(
+        `
+        id, date,
+        students(id, name, surname),
+        schedules(id, day_of_week, start_time, end_time),
+        users!classes_teacher_id_fkey(id, name, surname),
+        class_topics(
+          topics(id, name,
+            subjects(id, name)
+          )
+        )
+      `,
+        { count: 'exact' },
+      )
+      .eq('student_id', studentId)
+      .eq('organization_id', organizationId)
+      .eq('is_active', true)
+      .eq('class_topics.is_active', true)
+      .order('date', { ascending: false })
+      .range(from, to);
+
+    if (result.error) {
+      throw new DatabaseException();
+    }
+
+    const items = (result.data ?? []).map((row: any) =>
+      this.mapToClassDetail(row),
+    );
+
+    return new PaginatedResponse(
+      items,
+      result.count ?? 0,
+      pagination.page,
+      pagination.limit,
+    );
+  }
+
   public async countActiveByOrganizationId(
     organizationId: string,
   ): Promise<number> {
@@ -236,6 +315,41 @@ export class ClassesRepository extends IClassesRepository {
       data.updated_by,
       createdAtDate,
       updatedAtDate,
+    );
+  }
+
+  private mapToClassDetail(data: any): ClassDetail {
+    const teacher = data.users;
+    const topics = (data.class_topics ?? [])
+      .filter((ct: any) => ct.topics)
+      .map((ct: any) => ({
+        id: ct.topics.id,
+        name: ct.topics.name,
+        subject: {
+          id: ct.topics.subjects.id,
+          name: ct.topics.subjects.name,
+        },
+      }));
+
+    return new ClassDetail(
+      { id: data.id, date: data.date },
+      {
+        id: data.students.id,
+        name: data.students.name,
+        surname: data.students.surname,
+      },
+      {
+        id: data.schedules.id,
+        dayOfWeek: data.schedules.day_of_week,
+        startTime: data.schedules.start_time,
+        endTime: data.schedules.end_time,
+      },
+      {
+        id: teacher.id,
+        name: teacher.name,
+        surname: teacher.surname,
+      },
+      topics,
     );
   }
 }

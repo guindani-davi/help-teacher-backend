@@ -1031,6 +1031,7 @@ export type Database = {
           id: string
           pending_plan_id: string | null
           plan_id: string
+          proration_asaas_payment_id: string | null
           status: Database["public"]["Enums"]["subscription_status"]
           trial_ends_at: string | null
           updated_at: string | null
@@ -1045,6 +1046,7 @@ export type Database = {
           id?: string
           pending_plan_id?: string | null
           plan_id: string
+          proration_asaas_payment_id?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           trial_ends_at?: string | null
           updated_at?: string | null
@@ -1059,6 +1061,7 @@ export type Database = {
           id?: string
           pending_plan_id?: string | null
           plan_id?: string
+          proration_asaas_payment_id?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
           trial_ends_at?: string | null
           updated_at?: string | null
@@ -1093,6 +1096,7 @@ export type Database = {
           asaas_customer_id: string | null
           created_at: string
           email: string
+          has_used_trial: boolean
           hashed_password: string
           id: string
           locale: string
@@ -1104,6 +1108,7 @@ export type Database = {
           asaas_customer_id?: string | null
           created_at?: string
           email: string
+          has_used_trial?: boolean
           hashed_password: string
           id?: string
           locale?: string
@@ -1115,6 +1120,7 @@ export type Database = {
           asaas_customer_id?: string | null
           created_at?: string
           email?: string
+          has_used_trial?: boolean
           hashed_password?: string
           id?: string
           locale?: string

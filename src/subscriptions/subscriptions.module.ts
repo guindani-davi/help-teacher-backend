@@ -17,7 +17,7 @@ import { SubscriptionsService } from './services/implementations/subscriptions.s
     HelpersModule,
     forwardRef(() => AsaasModule),
     forwardRef(() => AuthModule),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   providers: [
     {

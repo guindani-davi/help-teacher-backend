@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { IGradeLevelsService } from 'src/grade-levels/services/i.grade-levels.service';
-import { IRegistrationsService } from 'src/registrations/services/i.registrations.service';
-import { IReportCacheService } from 'src/reports/services/i.report-cache.service';
+import { IGradeLevelsService } from '../../grade-levels/services/i.grade-levels.service';
+import { IRegistrationsService } from '../../registrations/services/i.registrations.service';
+import { IReportCacheService } from '../../reports/services/i.report-cache.service';
 
 import type { JwtPayload } from '../../auth/models/jwt.model';
 import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';

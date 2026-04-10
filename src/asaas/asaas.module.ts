@@ -5,7 +5,9 @@ import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { AsaasWebhookController } from './controllers/implementations/asaas-webhook.controller';
 import { IWebhookEventsRepository } from './repositories/i.webhook-events.repository';
 import { WebhookEventsRepository } from './repositories/implementations/webhook-events.repository';
+import { IAsaasWebhookService } from './services/i.asaas-webhook.service';
 import { IAsaasService } from './services/i.asaas.service';
+import { AsaasWebhookService } from './services/implementations/asaas-webhook.service';
 import { AsaasService } from './services/implementations/asaas.service';
 
 @Module({
@@ -23,6 +25,10 @@ import { AsaasService } from './services/implementations/asaas.service';
     {
       provide: IWebhookEventsRepository,
       useClass: WebhookEventsRepository,
+    },
+    {
+      provide: IAsaasWebhookService,
+      useClass: AsaasWebhookService,
     },
   ],
   exports: [IAsaasService, IWebhookEventsRepository],

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { IClassTopicsService } from 'src/class-topics/services/i.class-topics.service';
-import { IReportCacheService } from 'src/reports/services/i.report-cache.service';
-import { ITopicsService } from 'src/topics/services/i.topics.service';
 import type { JwtPayload } from '../../auth/models/jwt.model';
+import { IClassTopicsService } from '../../class-topics/services/i.class-topics.service';
 import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../common/models/paginated-response.model';
 import { IHelpersService } from '../../helpers/services/i.helpers.service';
 import type { Membership } from '../../memberships/models/membership.model';
+import { IReportCacheService } from '../../reports/services/i.report-cache.service';
+import { ITopicsService } from '../../topics/services/i.topics.service';
 import { CreateSubjectBodyDTO } from '../dtos/create-subject.dto';
 import { DeleteSubjectParamsDTO } from '../dtos/delete-subject.dto';
 import { GetSubjectParamsDTO } from '../dtos/get-subject.dto';

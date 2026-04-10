@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { IDatabaseService } from 'src/database/services/i.database.service';
 import type { JwtPayload } from '../../auth/models/jwt.model';
+import { IDatabaseService } from '../../database/services/i.database.service';
 import type { Membership } from '../../memberships/models/membership.model';
 import { GetStudentReportParamsDTO } from '../dtos/get-student-report.dto';
 import { StudentReport } from '../models/student-report.model';

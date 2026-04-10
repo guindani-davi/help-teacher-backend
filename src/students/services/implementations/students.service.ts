@@ -16,6 +16,7 @@ import {
   UpdateStudentBodyDTO,
   UpdateStudentParamsDTO,
 } from '../../dtos/update-student.dto';
+import { StudentDetail } from '../../models/student-detail.model';
 import { Student } from '../../models/student.model';
 import { IStudentsRepository } from '../../repositories/i.students.repository';
 import { IStudentsService } from '../i.students.service';
@@ -67,6 +68,16 @@ export class StudentsService extends IStudentsService {
       typeof membership === 'string' ? membership : membership.organizationId;
 
     return this.studentsRepository.getById(studentId, organizationId);
+  }
+
+  public async getDetails(
+    params: GetStudentParamsDTO,
+    membership: Membership,
+  ): Promise<StudentDetail> {
+    return this.studentsRepository.getDetailById(
+      params.studentId,
+      membership.organizationId,
+    );
   }
 
   public async getByOrganization(

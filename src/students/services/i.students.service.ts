@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { IClassTopicsService } from 'src/class-topics/services/i.class-topics.service';
-import { IClassesService } from 'src/classes/services/i.classes.service';
-import { IRegistrationsService } from 'src/registrations/services/i.registrations.service';
-import { IReportCacheService } from 'src/reports/services/i.report-cache.service';
-import { IStudentUsersService } from 'src/student-users/services/i.student-users.service';
 import type { JwtPayload } from '../../auth/models/jwt.model';
+import { IClassTopicsService } from '../../class-topics/services/i.class-topics.service';
+import { IClassesService } from '../../classes/services/i.classes.service';
 import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../common/models/paginated-response.model';
 import { IHelpersService } from '../../helpers/services/i.helpers.service';
 import type { Membership } from '../../memberships/models/membership.model';
+import { IRegistrationsService } from '../../registrations/services/i.registrations.service';
+import { IReportCacheService } from '../../reports/services/i.report-cache.service';
+import { IStudentUsersService } from '../../student-users/services/i.student-users.service';
 import { CreateStudentBodyDTO } from '../dtos/create-student.dto';
 import { DeleteStudentParamsDTO } from '../dtos/delete-student.dto';
 import { GetStudentParamsDTO } from '../dtos/get-student.dto';
@@ -16,6 +16,7 @@ import {
   UpdateStudentBodyDTO,
   UpdateStudentParamsDTO,
 } from '../dtos/update-student.dto';
+import { StudentDetail } from '../models/student-detail.model';
 import { Student } from '../models/student.model';
 import { IStudentsRepository } from '../repositories/i.students.repository';
 
@@ -56,6 +57,10 @@ export abstract class IStudentsService {
     params: GetStudentParamsDTO | string,
     membership: Membership | string,
   ): Promise<Student>;
+  public abstract getDetails(
+    params: GetStudentParamsDTO,
+    membership: Membership,
+  ): Promise<StudentDetail>;
   public abstract getByOrganization(
     membership: Membership,
     pagination: PaginationQueryDTO,

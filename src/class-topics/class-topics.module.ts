@@ -3,6 +3,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ClassesModule } from '../classes/classes.module';
 import { DatabaseModule } from '../database/database.module';
 import { HelpersModule } from '../helpers/helpers.module';
+import { MembershipsModule } from '../memberships/memberships.module';
 import { ReportsModule } from '../reports/reports.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { TopicsModule } from '../topics/topics.module';
@@ -18,6 +19,7 @@ import { ClassTopicsService } from './services/implementations/class-topics.serv
     DatabaseModule,
     HelpersModule,
     forwardRef(() => AuthModule),
+    forwardRef(() => MembershipsModule),
     forwardRef(() => SubscriptionsModule),
     forwardRef(() => ClassesModule),
     forwardRef(() => TopicsModule),

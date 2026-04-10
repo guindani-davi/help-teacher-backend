@@ -5,8 +5,8 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import { IMembershipsService } from '../../memberships/services/i.memberships.service';
-import type { JwtPayload } from '../models/jwt.model';
+import type { JwtPayload } from '../../auth/models/jwt.model';
+import { IMembershipsService } from '../services/i.memberships.service';
 
 @Injectable()
 export class MembershipGuard implements CanActivate {

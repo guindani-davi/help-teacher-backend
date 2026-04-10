@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Database } from 'src/database/types';
 import { DatabaseException } from '../../../database/exceptions/database.exception';
 import { IDatabaseService } from '../../../database/services/i.database.service';
+import { Database } from '../../../database/types';
 import { IHelpersService } from '../../../helpers/services/i.helpers.service';
 import { WebhookEvent } from '../../models/webhook-event.model';
 import { IWebhookEventsRepository } from '../i.webhook-events.repository';

@@ -9,6 +9,7 @@ import {
   UpdateClassBodyDTO,
   UpdateClassParamsDTO,
 } from '../dtos/update-class.dto';
+import { ClassDetail } from '../models/class-detail.model';
 import { Class } from '../models/class.model';
 import { IClassesService } from '../services/i.classes.service';
 
@@ -28,6 +29,10 @@ export abstract class IClassesController {
     params: GetClassParamsDTO,
     membership: Membership,
   ): Promise<Class>;
+  public abstract getDetails(
+    params: GetClassParamsDTO,
+    membership: Membership,
+  ): Promise<ClassDetail>;
   public abstract getByOrganization(
     membership: Membership,
     pagination: PaginationQueryDTO,

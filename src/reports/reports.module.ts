@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { DatabaseModule } from '../database/database.module';
+import { MembershipsModule } from '../memberships/memberships.module';
 import { StorageModule } from '../storage/storage.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { ReportsController } from './controllers/implementations/reports.controller';
@@ -19,6 +20,7 @@ import { ReportsService } from './services/implementations/reports.service';
     DatabaseModule,
     StorageModule,
     forwardRef(() => AuthModule),
+    forwardRef(() => MembershipsModule),
     forwardRef(() => SubscriptionsModule),
   ],
   providers: [

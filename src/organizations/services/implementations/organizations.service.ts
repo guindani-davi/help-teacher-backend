@@ -1,9 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { JwtPayload } from '../../../auth/models/jwt.model';
 import { IHelpersService } from '../../../helpers/services/i.helpers.service';
 import { IReportCacheService } from '../../../reports/services/i.report-cache.service';
 import { StorageBucket } from '../../../storage/enums/storage-bucket.enum';
 import { IStorageService } from '../../../storage/services/i.storage.service';
+import {
+  SubscriptionTierEnum,
+  TIER_HIERARCHY,
+} from '../../../subscriptions/enums/subscription-tier.enum';
+import { ISubscriptionsService } from '../../../subscriptions/services/i.subscriptions.service';
 import { CreateOrganizationBodyDTO } from '../../dtos/create-organization.dto';
 import { DeleteOrganizationParamsDTO } from '../../dtos/delete-organization.dto';
 import { GetOrganizationBySlugParamsDTO } from '../../dtos/get-organization.dto';
@@ -11,10 +16,13 @@ import {
   UpdateOrganizationBySlugBodyDTO,
   UpdateOrganizationBySlugParamsDTO,
 } from '../../dtos/update-organization.dto';
+import { OrganizationLimitReachedException } from '../../exceptions/organization-limit-reached.exception';
 import { SlugAlreadyExistsException } from '../../exceptions/slug-already-exists.exception';
 import { Organization } from '../../models/organization.model';
 import { IOrganizationsRepository } from '../../repositories/i.organizations.repository';
 import { IOrganizationsService } from '../i.organizations.service';
+
+const BASIC_MAX_ORGANIZATIONS = 1;
 
 @Injectable()
 export class OrganizationsService extends IOrganizationsService {
@@ -25,12 +33,15 @@ export class OrganizationsService extends IOrganizationsService {
     @Inject(IStorageService) storageService: IStorageService,
     @Inject(IReportCacheService)
     reportCacheService: IReportCacheService,
+    @Inject(forwardRef(() => ISubscriptionsService))
+    subscriptionsService: ISubscriptionsService,
   ) {
     super(
       organizationsRepository,
       helperService,
       storageService,
       reportCacheService,
+      subscriptionsService,
     );
   }
 
@@ -38,6 +49,21 @@ export class OrganizationsService extends IOrganizationsService {
     body: CreateOrganizationBodyDTO,
     user: JwtPayload,
   ): Promise<Organization> {
+    const tier = await this.subscriptionsService.getUserTier(user.sub);
+
+    if (
+      tier &&
+      TIER_HIERARCHY[tier] <= TIER_HIERARCHY[SubscriptionTierEnum.BASIC]
+    ) {
+      const ownedCount = await this.organizationsRepository.countActiveByOwner(
+        user.sub,
+      );
+
+      if (ownedCount >= BASIC_MAX_ORGANIZATIONS) {
+        throw new OrganizationLimitReachedException();
+      }
+    }
+
     const slug = await this.generateUniqueSlug(body.name);
 
     return this.organizationsRepository.createOrganization(body, slug, user);

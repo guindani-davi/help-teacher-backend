@@ -61,13 +61,6 @@ export class MembershipsService extends IMembershipsService {
     callerMembership: Membership,
     user: JwtPayload,
   ): Promise<Membership> {
-    if (body.roles?.includes(RolesEnum.OWNER)) {
-      throw new ForbiddenOperationException(
-        'Cannot assign owner role directly',
-        'errors.cannotAssignOwnerRole',
-      );
-    }
-
     const targetMembership = await this.membershipsRepository.getMembershipById(
       params.memberId,
     );
@@ -79,7 +72,14 @@ export class MembershipsService extends IMembershipsService {
       );
     }
 
-    if (targetMembership.isOwner()) {
+    if (body.roles) {
+      this.validateOwnerRoleIntegrity(body.roles, targetMembership);
+    }
+
+    if (
+      targetMembership.isOwner() &&
+      targetMembership.id !== callerMembership.id
+    ) {
       throw new ForbiddenOperationException(
         'You do not have permission to update this member',
         'errors.cannotUpdateOwner',
@@ -222,5 +222,27 @@ export class MembershipsService extends IMembershipsService {
     role: RolesEnum,
   ): Promise<boolean> {
     return this.membershipsRepository.hasRole(userId, organizationId, role);
+  }
+
+  private validateOwnerRoleIntegrity(
+    newRoles: RolesEnum[],
+    targetMembership: Membership,
+  ): void {
+    const includesOwner = newRoles.includes(RolesEnum.OWNER);
+    const isCurrentlyOwner = targetMembership.isOwner();
+
+    if (includesOwner && !isCurrentlyOwner) {
+      throw new ForbiddenOperationException(
+        'Cannot assign owner role directly, use transfer ownership',
+        'errors.cannotAssignOwnerRole',
+      );
+    }
+
+    if (!includesOwner && isCurrentlyOwner) {
+      throw new ForbiddenOperationException(
+        'Cannot remove owner role directly, use transfer ownership',
+        'errors.cannotRemoveOwnerRole',
+      );
+    }
   }
 }

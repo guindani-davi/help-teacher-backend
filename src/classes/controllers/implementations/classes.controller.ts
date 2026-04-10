@@ -16,11 +16,11 @@ import { CurrentMembership } from '../../../auth/decorators/current-membership.d
 import { CurrentUser } from '../../../auth/decorators/current-user.decorator';
 import { AllowedRoles } from '../../../auth/decorators/roles.decorator';
 import { RolesEnum } from '../../../auth/enums/roles.enum';
-import { MembershipGuard } from '../../../auth/guards/membership.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import type { JwtPayload } from '../../../auth/models/jwt.model';
 import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../../common/models/paginated-response.model';
+import { MembershipGuard } from '../../../memberships/guards/membership.guard';
 import type { Membership } from '../../../memberships/models/membership.model';
 import { ActiveSubscriptionGuard } from '../../../subscriptions/guards/active-subscription.guard';
 import { CreateClassBodyDTO } from '../../dtos/create-class.dto';
@@ -30,6 +30,7 @@ import {
   UpdateClassBodyDTO,
   UpdateClassParamsDTO,
 } from '../../dtos/update-class.dto';
+import { ClassDetail } from '../../models/class-detail.model';
 import { Class } from '../../models/class.model';
 import { IClassesService } from '../../services/i.classes.service';
 import { IClassesController } from '../i.classes.controller';
@@ -68,6 +69,15 @@ export class ClassesController extends IClassesController {
     @CurrentMembership() membership: Membership,
   ): Promise<Class> {
     return this.classesService.getById(params, membership);
+  }
+
+  @Get(':slug/classes/:classId/details')
+  @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN, RolesEnum.TEACHER)
+  public async getDetails(
+    @Param() params: GetClassParamsDTO,
+    @CurrentMembership() membership: Membership,
+  ): Promise<ClassDetail> {
+    return this.classesService.getDetails(params, membership);
   }
 
   @Patch(':slug/classes/:classId')

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { IClassTopicsService } from 'src/class-topics/services/i.class-topics.service';
-import { IClassesService } from 'src/classes/services/i.classes.service';
-import { IReportCacheService } from 'src/reports/services/i.report-cache.service';
 import type { JwtPayload } from '../../auth/models/jwt.model';
+import { IClassTopicsService } from '../../class-topics/services/i.class-topics.service';
+import { IClassesService } from '../../classes/services/i.classes.service';
 import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../common/models/paginated-response.model';
 import { IHelpersService } from '../../helpers/services/i.helpers.service';
 import type { Membership } from '../../memberships/models/membership.model';
+import { IReportCacheService } from '../../reports/services/i.report-cache.service';
 import { CreateScheduleBodyDTO } from '../dtos/create-schedule.dto';
 import { DeleteScheduleParamsDTO } from '../dtos/delete-schedule.dto';
 import { GetScheduleParamsDTO } from '../dtos/get-schedule.dto';

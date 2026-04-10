@@ -1,7 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { InvalidCredentialsException } from '../../../auth/exceptions/invalid-credentials.exception';
+import { IAuthService } from '../../../auth/services/i.auth.service';
 import { IHelpersService } from '../../../helpers/services/i.helpers.service';
 import { CreateUserBodyDTO } from '../../dtos/create-user.dto';
 import {
@@ -9,6 +10,7 @@ import {
   GetUserByIdParamsDTO,
 } from '../../dtos/get-user.dto';
 import { UpdateUserBodyDTO } from '../../dtos/update-user.dto';
+import { SafeUser } from '../../models/safe-user.model';
 import { User } from '../../models/user.model';
 import { IUsersRepository } from '../../repositories/i.users.repository';
 import { IUsersService } from '../i.users.service';
@@ -23,17 +25,20 @@ export class UsersService extends IUsersService {
     @Inject(IUsersRepository) usersRepository: IUsersRepository,
     @Inject(ConfigService) configService: ConfigService,
     @Inject(IHelpersService) helperService: IHelpersService,
+    @Inject(forwardRef(() => IAuthService)) authService: IAuthService,
   ) {
-    super(usersRepository, helperService);
+    super(usersRepository, helperService, authService);
     this.configService = configService;
   }
 
-  public async createUser(body: CreateUserBodyDTO): Promise<User> {
+  public async createUserSafe(body: CreateUserBodyDTO): Promise<SafeUser> {
     const hashedPassword = await this.hashPassword(body.password);
 
     body.password = hashedPassword;
 
-    return this.usersRepository.createUser(body);
+    const user = await this.usersRepository.createUser(body);
+
+    return new SafeUser(user);
   }
 
   public async getUserById(params: GetUserByIdParamsDTO): Promise<User> {
@@ -70,10 +75,16 @@ export class UsersService extends IUsersService {
     await this.usersRepository.updatePassword(userId, hashedPassword);
   }
 
+  public async getMe(userId: string): Promise<SafeUser> {
+    const user = await this.usersRepository.getUserById(userId);
+
+    return new SafeUser(user);
+  }
+
   public async updateMe(
     userId: string,
     body: UpdateUserBodyDTO,
-  ): Promise<{ requiresReLogin: boolean }> {
+  ): Promise<void> {
     let requiresReLogin = false;
 
     if (body.password) {
@@ -96,7 +107,9 @@ export class UsersService extends IUsersService {
       requiresReLogin = true;
     }
 
-    return { requiresReLogin };
+    if (requiresReLogin) {
+      await this.authService.revokeAllUserRefreshTokens(userId);
+    }
   }
 
   private pepperPassword(password: string): string {
@@ -109,5 +122,9 @@ export class UsersService extends IUsersService {
     asaasCustomerId: string,
   ): Promise<void> {
     await this.usersRepository.updateAsaasCustomerId(userId, asaasCustomerId);
+  }
+
+  public async markTrialUsed(userId: string): Promise<void> {
+    await this.usersRepository.markTrialUsed(userId);
   }
 }

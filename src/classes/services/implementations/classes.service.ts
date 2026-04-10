@@ -1,11 +1,11 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { RolesEnum } from 'src/auth/enums/roles.enum';
-import { ForbiddenOperationException } from 'src/memberships/exceptions/forbidden-operation.exception';
+import { RolesEnum } from '../../../auth/enums/roles.enum';
 import type { JwtPayload } from '../../../auth/models/jwt.model';
 import { IClassTopicsService } from '../../../class-topics/services/i.class-topics.service';
 import { PaginationQueryDTO } from '../../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../../common/models/paginated-response.model';
 import { IHelpersService } from '../../../helpers/services/i.helpers.service';
+import { ForbiddenOperationException } from '../../../memberships/exceptions/forbidden-operation.exception';
 import type { Membership } from '../../../memberships/models/membership.model';
 import { IMembershipsService } from '../../../memberships/services/i.memberships.service';
 import { IReportCacheService } from '../../../reports/services/i.report-cache.service';
@@ -18,6 +18,7 @@ import {
   UpdateClassBodyDTO,
   UpdateClassParamsDTO,
 } from '../../dtos/update-class.dto';
+import { ClassDetail } from '../../models/class-detail.model';
 import { Class } from '../../models/class.model';
 import { IClassesRepository } from '../../repositories/i.classes.repository';
 import { IClassesService } from '../i.classes.service';
@@ -86,6 +87,30 @@ export class ClassesService extends IClassesService {
       typeof membership === 'string' ? membership : membership.organizationId;
 
     return this.classesRepository.getById(classId, organizationId);
+  }
+
+  public async getDetails(
+    params: GetClassParamsDTO,
+    membership: Membership,
+  ): Promise<ClassDetail> {
+    return this.classesRepository.getDetailById(
+      params.classId,
+      membership.organizationId,
+    );
+  }
+
+  public async getByStudentId(
+    studentId: string,
+    membership: Membership,
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<ClassDetail>> {
+    await this.studentsService.getById(studentId, membership.organizationId);
+
+    return this.classesRepository.getByStudentId(
+      studentId,
+      membership.organizationId,
+      pagination,
+    );
   }
 
   public async getByOrganization(

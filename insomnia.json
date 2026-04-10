@@ -675,6 +675,7 @@
       "method": "PUT",
       "url": "{{ _.base_url }}/subscriptions/change-plan",
       "parentId": "fld_subscriptions",
+      "description": "Change subscription plan. Behavior depends on current state:\n- No subscription + first trial: returns subscription (local trial, no payment)\n- No subscription + trial used: returns checkoutUrl (Asaas checkout)\n- Active trial: switches plan locally, returns subscription\n- Active + upgrade: returns invoiceUrl for prorated payment\n- Active + downgrade/lateral: deferred to next billing cycle, returns subscription\n- Expired/canceled/past_due: returns checkoutUrl (resubscription)",
       "headers": [
         {
           "name": "Content-Type",
@@ -697,7 +698,7 @@
       "method": "POST",
       "url": "{{ _.base_url }}/subscriptions/cancel",
       "parentId": "fld_subscriptions",
-      "description": "Schedule subscription cancellation at the end of the current billing period. User keeps access until then.",
+      "description": "Cancel subscription. Trial subscriptions are canceled immediately. Active subscriptions are scheduled for cancellation at the end of the current billing period. Also cleans up any pending proration upgrade payments.",
       "headers": [
         {
           "name": "Authorization",
@@ -730,7 +731,7 @@
       "method": "POST",
       "url": "{{ _.base_url }}/asaas/webhooks",
       "parentId": "fld_asaas",
-      "description": "Fired when ASAAS creates the first payment after checkout. Stores the ASAAS subscription ID on the user subscription.",
+      "description": "Fired when ASAAS creates the first payment after checkout. Stores the ASAAS subscription ID on the user subscription. Standalone proration payments are ignored here.",
       "headers": [
         {
           "name": "Content-Type",
@@ -743,7 +744,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"event\": \"PAYMENT_CREATED\",\n  \"payment\": {\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
+        "text": "{\n  \"event\": \"PAYMENT_CREATED\",\n  \"payment\": {\n    \"id\": \"pay_local_test\",\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
       }
     },
     {
@@ -753,7 +754,7 @@
       "method": "POST",
       "url": "{{ _.base_url }}/asaas/webhooks",
       "parentId": "fld_asaas",
-      "description": "Fired when a payment is confirmed. Transitions TRIALING to ACTIVE, applies pending plan changes.",
+      "description": "Fired when a payment is confirmed. Handles: (1) standalone proration payments → applies upgrade immediately, (2) subscription payments → activates subscription, applies pending plan changes.",
       "headers": [
         {
           "name": "Content-Type",
@@ -766,7 +767,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"event\": \"PAYMENT_CONFIRMED\",\n  \"payment\": {\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
+        "text": "{\n  \"event\": \"PAYMENT_CONFIRMED\",\n  \"payment\": {\n    \"id\": \"pay_local_test\",\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
       }
     },
     {
@@ -776,7 +777,7 @@
       "method": "POST",
       "url": "{{ _.base_url }}/asaas/webhooks",
       "parentId": "fld_asaas",
-      "description": "Fired when a payment becomes overdue. Sets subscription status to PAST_DUE (org features blocked).",
+      "description": "Fired when a payment becomes overdue. Handles: (1) standalone proration payments → clears pending upgrade, user keeps current plan, (2) subscription payments → sets subscription to PAST_DUE.",
       "headers": [
         {
           "name": "Content-Type",
@@ -789,7 +790,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"event\": \"PAYMENT_OVERDUE\",\n  \"payment\": {\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
+        "text": "{\n  \"event\": \"PAYMENT_OVERDUE\",\n  \"payment\": {\n    \"id\": \"pay_local_test\",\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
       }
     },
     {
@@ -813,6 +814,98 @@
       "body": {
         "mimeType": "application/json",
         "text": "{\n  \"event\": \"SUBSCRIPTION_INACTIVATED\",\n  \"payment\": {\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
+      }
+    },
+    {
+      "_id": "req_asaas_webhook_payment_received",
+      "_type": "request",
+      "name": "Webhook - PAYMENT_RECEIVED",
+      "method": "POST",
+      "url": "{{ _.base_url }}/asaas/webhooks",
+      "parentId": "fld_asaas",
+      "description": "Fired when a payment is received. Same handling as PAYMENT_CONFIRMED: processes proration payments or activates subscription.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "asaas-access-token",
+          "value": "YOUR_WEBHOOK_TOKEN_HERE"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event\": \"PAYMENT_RECEIVED\",\n  \"payment\": {\n    \"id\": \"pay_local_test\",\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
+      }
+    },
+    {
+      "_id": "req_asaas_webhook_subscription_deleted",
+      "_type": "request",
+      "name": "Webhook - SUBSCRIPTION_DELETED",
+      "method": "POST",
+      "url": "{{ _.base_url }}/asaas/webhooks",
+      "parentId": "fld_asaas",
+      "description": "Fired when a subscription is deleted in ASAAS. Sets status to CANCELED (same handling as SUBSCRIPTION_INACTIVATED).",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "asaas-access-token",
+          "value": "YOUR_WEBHOOK_TOKEN_HERE"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event\": \"SUBSCRIPTION_DELETED\",\n  \"payment\": {\n    \"subscription\": \"sub_local_test\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
+      }
+    },
+    {
+      "_id": "req_asaas_webhook_proration_confirmed",
+      "_type": "request",
+      "name": "Webhook - Proration Payment Confirmed",
+      "method": "POST",
+      "url": "{{ _.base_url }}/asaas/webhooks",
+      "parentId": "fld_asaas",
+      "description": "Simulates a standalone proration payment confirmation. The payment.id must match a proration_asaas_payment_id stored on a user_subscription. On confirmation, the pending upgrade is applied immediately and the Asaas subscription is reconfigured.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "asaas-access-token",
+          "value": "YOUR_WEBHOOK_TOKEN_HERE"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event\": \"PAYMENT_CONFIRMED\",\n  \"payment\": {\n    \"id\": \"PRORATION_PAYMENT_ID_HERE\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
+      }
+    },
+    {
+      "_id": "req_asaas_webhook_proration_overdue",
+      "_type": "request",
+      "name": "Webhook - Proration Payment Overdue",
+      "method": "POST",
+      "url": "{{ _.base_url }}/asaas/webhooks",
+      "parentId": "fld_asaas",
+      "description": "Simulates a standalone proration payment going overdue. Clears the pending upgrade state \u2014 user keeps their current plan.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "asaas-access-token",
+          "value": "YOUR_WEBHOOK_TOKEN_HERE"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"event\": \"PAYMENT_OVERDUE\",\n  \"payment\": {\n    \"id\": \"PRORATION_PAYMENT_ID_HERE\",\n    \"customer\": \"cus_local_test\",\n    \"externalReference\": \"USER_UUID_HERE\"\n  }\n}"
       }
     },
 
@@ -1204,6 +1297,46 @@
       "body": {}
     },
     {
+      "_id": "req_get_student_details",
+      "_type": "request",
+      "name": "Get Student Details",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/students/STUDENT_UUID_HERE/details",
+      "parentId": "fld_students",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_student_classes",
+      "_type": "request",
+      "name": "Get Student Classes",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/students/STUDENT_UUID_HERE/classes",
+      "parentId": "fld_students",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "page",
+          "value": "1"
+        },
+        {
+          "name": "limit",
+          "value": "20"
+        }
+      ],
+      "body": {}
+    },
+    {
       "_id": "req_update_student",
       "_type": "request",
       "name": "Update Student",
@@ -1531,6 +1664,21 @@
       "name": "Get Class by ID",
       "method": "GET",
       "url": "{{ _.base_url }}/organizations/my-organization/classes/CLASS_UUID_HERE",
+      "parentId": "fld_classes",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token }}"
+        }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_get_class_details",
+      "_type": "request",
+      "name": "Get Class Details",
+      "method": "GET",
+      "url": "{{ _.base_url }}/organizations/my-organization/classes/CLASS_UUID_HERE/details",
       "parentId": "fld_classes",
       "headers": [
         {

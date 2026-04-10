@@ -172,6 +172,35 @@ export class SubscriptionsRepository extends ISubscriptionsRepository {
     return this.mapToEntity(result.data);
   }
 
+  public async updateSubscriptionStatusByUserId(
+    userId: string,
+    status: SubscriptionStatusEnum,
+    canceledAt?: Date,
+  ): Promise<UserSubscription | null> {
+    const updateData: Database['public']['Tables']['user_subscriptions']['Update'] =
+      {
+        status,
+        updated_at: new Date().toISOString(),
+      };
+
+    if (canceledAt) {
+      updateData.canceled_at = canceledAt.toISOString();
+    }
+
+    const result = await this.databaseService
+      .from('user_subscriptions')
+      .update(updateData)
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (!result.data) {
+      return null;
+    }
+
+    return this.mapToEntity(result.data);
+  }
+
   public async getUserSubscriptionByAsaasId(
     asaasSubscriptionId: string,
   ): Promise<UserSubscription | null> {
@@ -222,26 +251,7 @@ export class SubscriptionsRepository extends ISubscriptionsRepository {
         cancel_at_period_end: false,
         current_period_end: null,
         pending_plan_id: null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', userId)
-      .select()
-      .single();
-
-    if (result.error || !result.data) {
-      throw new DatabaseException();
-    }
-
-    return this.mapToEntity(result.data);
-  }
-
-  public async clearAsaasSubscriptionId(
-    userId: string,
-  ): Promise<UserSubscription> {
-    const result = await this.databaseService
-      .from('user_subscriptions')
-      .update({
-        asaas_subscription_id: null,
+        proration_asaas_payment_id: null,
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', userId)
@@ -279,6 +289,63 @@ export class SubscriptionsRepository extends ISubscriptionsRepository {
 
     if (result.error || !result.data) {
       throw new DatabaseException();
+    }
+
+    return this.mapToEntity(result.data);
+  }
+
+  public async setProrationPaymentId(
+    userId: string,
+    paymentId: string,
+  ): Promise<UserSubscription> {
+    const result = await this.databaseService
+      .from('user_subscriptions')
+      .update({
+        proration_asaas_payment_id: paymentId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (result.error || !result.data) {
+      throw new DatabaseException();
+    }
+
+    return this.mapToEntity(result.data);
+  }
+
+  public async clearProrationPaymentId(
+    userId: string,
+  ): Promise<UserSubscription> {
+    const result = await this.databaseService
+      .from('user_subscriptions')
+      .update({
+        proration_asaas_payment_id: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .select()
+      .single();
+
+    if (result.error || !result.data) {
+      throw new DatabaseException();
+    }
+
+    return this.mapToEntity(result.data);
+  }
+
+  public async getUserSubscriptionByProrationPaymentId(
+    paymentId: string,
+  ): Promise<UserSubscription | null> {
+    const result = await this.databaseService
+      .from('user_subscriptions')
+      .select()
+      .eq('proration_asaas_payment_id', paymentId)
+      .single();
+
+    if (!result.data) {
+      return null;
     }
 
     return this.mapToEntity(result.data);
@@ -414,6 +481,7 @@ export class SubscriptionsRepository extends ISubscriptionsRepository {
       data.pending_plan_id,
       data.trial_ends_at ? new Date(data.trial_ends_at) : null,
       data.current_period_end ? new Date(data.current_period_end) : null,
+      data.proration_asaas_payment_id,
       data.cancel_at_period_end,
       data.canceled_at ? new Date(data.canceled_at) : null,
       createdAtDate,

@@ -1,17 +1,11 @@
-import { ISubscriptionsService } from '../../subscriptions/services/i.subscriptions.service';
 import { AsaasWebhookEventDTO } from '../dtos/asaas-webhook-event.dto';
-import { IWebhookEventsRepository } from '../repositories/i.webhook-events.repository';
+import { IAsaasWebhookService } from '../services/i.asaas-webhook.service';
 
 export abstract class IAsaasWebhookController {
-  protected readonly webhookEventsRepository: IWebhookEventsRepository;
-  protected readonly subscriptionsService: ISubscriptionsService;
+  protected readonly asaasWebhookService: IAsaasWebhookService;
 
-  public constructor(
-    webhookEventsRepository: IWebhookEventsRepository,
-    subscriptionsService: ISubscriptionsService,
-  ) {
-    this.webhookEventsRepository = webhookEventsRepository;
-    this.subscriptionsService = subscriptionsService;
+  public constructor(asaasWebhookService: IAsaasWebhookService) {
+    this.asaasWebhookService = asaasWebhookService;
   }
 
   public abstract handleWebhook(

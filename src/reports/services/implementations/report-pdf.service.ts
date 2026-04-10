@@ -1,4 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
+import chromium from '@sparticuz/chromium';
+import puppeteer from 'puppeteer-core';
 import { LocaleEnum } from '../../../i18n/enums/locale.enum';
 import { II18nService } from '../../../i18n/services/i.i18n.service';
 import { StudentReport } from '../../models/student-report.model';
@@ -21,10 +23,20 @@ export class ReportPdfService extends IReportPdfService {
     const labels = this.buildLabels(locale);
     const html = buildStudentReportHtml(report, labels, locale);
 
-    const puppeteer = await import('puppeteer');
-    const browser = await puppeteer.default.launch({
+    const isServerless =
+      !!process.env.AWS_LAMBDA_FUNCTION_NAME || !!process.env.VERCEL;
+
+    const executablePath = isServerless
+      ? await chromium.executablePath()
+      : (process.env.CHROME_EXECUTABLE_PATH ?? undefined);
+
+    const browser = await puppeteer.launch({
+      args: isServerless
+        ? chromium.args
+        : ['--no-sandbox', '--disable-setuid-sandbox'],
+      defaultViewport: { width: 1920, height: 1080 },
+      executablePath,
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     try {

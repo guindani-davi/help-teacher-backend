@@ -31,6 +31,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/throttler": "^6.5.0",
+    "@sparticuz/chromium": "^147.0.0",
     "@supabase/supabase-js": "^2.93.2",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
@@ -38,7 +39,7 @@
     "helmet": "^8.1.0",
     "husky": "^9.1.7",
     "nodemailer": "^8.0.1",
-    "puppeteer": "^24.40.0",
+    "puppeteer-core": "^24.40.0",
     "reflect-metadata": "^0.2.2",
     "resend": "^6.9.2",
     "rxjs": "^7.8.1"

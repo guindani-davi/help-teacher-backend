@@ -7,6 +7,7 @@ export class User {
   public readonly surname: string;
   public readonly hashedPassword: string;
   public readonly asaasCustomerId: string | null;
+  public readonly hasUsedTrial: boolean;
   public readonly locale: LocaleEnum;
   public readonly createdAt: Date;
   public readonly updatedAt: Date | null;
@@ -18,6 +19,7 @@ export class User {
     surname: string,
     hashedPassword: string,
     asaasCustomerId: string | null,
+    hasUsedTrial: boolean,
     locale: LocaleEnum,
     createdAt: Date,
     updatedAt: Date | null,
@@ -28,6 +30,7 @@ export class User {
     this.surname = surname;
     this.hashedPassword = hashedPassword;
     this.asaasCustomerId = asaasCustomerId;
+    this.hasUsedTrial = hasUsedTrial;
     this.locale = locale;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;

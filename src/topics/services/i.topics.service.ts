@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { IClassTopicsService } from 'src/class-topics/services/i.class-topics.service';
-import { IReportCacheService } from 'src/reports/services/i.report-cache.service';
-import { ISubjectsService } from 'src/subjects/services/i.subjects.service';
+import { IClassTopicsService } from '../../class-topics/services/i.class-topics.service';
+import { IReportCacheService } from '../../reports/services/i.report-cache.service';
+import { ISubjectsService } from '../../subjects/services/i.subjects.service';
 
 import type { JwtPayload } from '../../auth/models/jwt.model';
 import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';

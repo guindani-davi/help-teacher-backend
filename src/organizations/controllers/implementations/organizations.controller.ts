@@ -21,9 +21,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CurrentUser } from '../../../auth/decorators/current-user.decorator';
 import { AllowedRoles } from '../../../auth/decorators/roles.decorator';
 import { RolesEnum } from '../../../auth/enums/roles.enum';
-import { MembershipGuard } from '../../../auth/guards/membership.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import type { JwtPayload } from '../../../auth/models/jwt.model';
+import { MembershipGuard } from '../../../memberships/guards/membership.guard';
+import { ActiveSubscriptionGuard } from '../../../subscriptions/guards/active-subscription.guard';
+import { UserSubscriptionGuard } from '../../../subscriptions/guards/user-subscription.guard';
 import { CreateOrganizationBodyDTO } from '../../dtos/create-organization.dto';
 import { DeleteOrganizationParamsDTO } from '../../dtos/delete-organization.dto';
 import { GetOrganizationBySlugParamsDTO } from '../../dtos/get-organization.dto';
@@ -46,6 +48,7 @@ export class OrganizationsController extends IOrganizationsController {
   }
 
   @Post()
+  @UseGuards(UserSubscriptionGuard)
   public async createOrganization(
     @Body() body: CreateOrganizationBodyDTO,
     @CurrentUser() user: JwtPayload,
@@ -54,7 +57,7 @@ export class OrganizationsController extends IOrganizationsController {
   }
 
   @Get(':slug')
-  @UseGuards(MembershipGuard)
+  @UseGuards(MembershipGuard, ActiveSubscriptionGuard)
   public async getOrganizationBySlug(
     @Param() params: GetOrganizationBySlugParamsDTO,
   ): Promise<Organization> {
@@ -62,7 +65,7 @@ export class OrganizationsController extends IOrganizationsController {
   }
 
   @Patch(':slug')
-  @UseGuards(MembershipGuard, RolesGuard)
+  @UseGuards(MembershipGuard, RolesGuard, ActiveSubscriptionGuard)
   @AllowedRoles(RolesEnum.OWNER)
   public async updateOrganization(
     @Param() params: UpdateOrganizationBySlugParamsDTO,
@@ -73,7 +76,7 @@ export class OrganizationsController extends IOrganizationsController {
   }
 
   @Delete(':slug')
-  @UseGuards(MembershipGuard, RolesGuard)
+  @UseGuards(MembershipGuard, RolesGuard, ActiveSubscriptionGuard)
   @AllowedRoles(RolesEnum.OWNER)
   @HttpCode(HttpStatus.NO_CONTENT)
   public async deleteOrganization(
@@ -84,7 +87,7 @@ export class OrganizationsController extends IOrganizationsController {
   }
 
   @Put(':slug/logo')
-  @UseGuards(MembershipGuard, RolesGuard)
+  @UseGuards(MembershipGuard, RolesGuard, ActiveSubscriptionGuard)
   @AllowedRoles(RolesEnum.OWNER, RolesEnum.ADMIN)
   @UseInterceptors(FileInterceptor('file'))
   public async uploadLogo(

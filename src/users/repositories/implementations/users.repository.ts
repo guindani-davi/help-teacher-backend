@@ -117,6 +117,20 @@ export class UsersRepository extends IUsersRepository {
     }
   }
 
+  public async markTrialUsed(userId: string): Promise<void> {
+    const result = await this.databaseService
+      .from('users')
+      .update({
+        has_used_trial: true,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId);
+
+    if (result.error) {
+      throw new DatabaseException();
+    }
+  }
+
   private mapToEntity(
     data: Database['public']['Tables']['users']['Row'],
   ): User {
@@ -130,6 +144,7 @@ export class UsersRepository extends IUsersRepository {
       data.surname,
       data.hashed_password,
       data.asaas_customer_id,
+      data.has_used_trial,
       data.locale as LocaleEnum,
       createdAtDate,
       updatedAtDate,

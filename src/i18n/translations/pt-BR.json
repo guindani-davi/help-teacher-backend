@@ -12,6 +12,7 @@
     "inviteExpired": "Este convite expirou",
     "insufficientSubscription": "Esta ação requer pelo menos uma assinatura {requiredTier}. Se você não é o dono da organização, entre em contato para solicitar um upgrade.",
     "subscriptionRequired": "Uma assinatura ativa é necessária para realizar esta ação. Se você não é o dono da organização, entre em contato para que ele assine.",
+    "userSubscriptionRequired": "Uma assinatura ativa é necessária para realizar esta ação. Por favor, assine um plano para continuar.",
     "subscriptionAlreadyCanceling": "A assinatura já está agendada para cancelamento no final do período atual",
     "subscriptionNotCanceling": "A assinatura não está pendente de cancelamento",
     "subscriptionCancelNotAllowed": "Não é possível cancelar a assinatura no estado atual",
@@ -38,7 +39,8 @@
     "studentUserNotLinked": "O vínculo aluno-usuário não pertence a este aluno",
     "noAccessToStudent": "Você não tem acesso a este aluno",
     "teacherNotInOrganization": "O professor não é membro desta organização",
-    "registrationOverlap": "O aluno já possui uma matrícula que se sobrepõe ao intervalo de datas informado"
+    "registrationOverlap": "O aluno já possui uma matrícula que se sobrepõe ao intervalo de datas informado",
+    "organizationLimitReached": "Você atingiu o número máximo de organizações para o seu plano atual. Atualize para o Pro ou exclua uma organização existente."
   },
   "emails": {
     "passwordReset": {

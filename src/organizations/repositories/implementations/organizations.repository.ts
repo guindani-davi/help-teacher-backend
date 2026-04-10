@@ -282,6 +282,21 @@ export class OrganizationsRepository extends IOrganizationsRepository {
     ]);
   }
 
+  public async countActiveByOwner(userId: string): Promise<number> {
+    const result = await this.databaseService
+      .from('memberships')
+      .select('organization_id, organizations!inner(is_active)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .contains('roles', [RolesEnum.OWNER])
+      .eq('organizations.is_active', true);
+
+    return result.count ?? 0;
+  }
+
   private mapToEntity(
     data: Database['public']['Tables']['organizations']['Row'],
   ): Organization {

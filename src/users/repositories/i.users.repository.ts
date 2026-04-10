@@ -31,4 +31,5 @@ export abstract class IUsersRepository {
     userId: string,
     locale: LocaleEnum,
   ): Promise<void>;
+  public abstract markTrialUsed(userId: string): Promise<void>;
 }

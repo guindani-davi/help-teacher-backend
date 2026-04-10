@@ -41,6 +41,11 @@ export abstract class ISubscriptionsRepository {
     status: SubscriptionStatusEnum,
     canceledAt?: Date,
   ): Promise<UserSubscription | null>;
+  public abstract updateSubscriptionStatusByUserId(
+    userId: string,
+    status: SubscriptionStatusEnum,
+    canceledAt?: Date,
+  ): Promise<UserSubscription | null>;
   public abstract getUserSubscriptionByAsaasId(
     asaasSubscriptionId: string,
   ): Promise<UserSubscription | null>;
@@ -60,12 +65,19 @@ export abstract class ISubscriptionsRepository {
     userId: string,
     planId: string,
   ): Promise<UserSubscription>;
-  public abstract clearAsaasSubscriptionId(
-    userId: string,
-  ): Promise<UserSubscription>;
   public abstract setCancelAtPeriodEnd(
     userId: string,
     cancel: boolean,
     currentPeriodEnd?: Date,
   ): Promise<UserSubscription>;
+  public abstract setProrationPaymentId(
+    userId: string,
+    paymentId: string,
+  ): Promise<UserSubscription>;
+  public abstract clearProrationPaymentId(
+    userId: string,
+  ): Promise<UserSubscription>;
+  public abstract getUserSubscriptionByProrationPaymentId(
+    paymentId: string,
+  ): Promise<UserSubscription | null>;
 }

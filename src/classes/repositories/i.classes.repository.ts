@@ -2,6 +2,7 @@ import { PaginationQueryDTO } from '../../common/dtos/pagination-query.dto';
 import { PaginatedResponse } from '../../common/models/paginated-response.model';
 import { IDatabaseService } from '../../database/services/i.database.service';
 import { IHelpersService } from '../../helpers/services/i.helpers.service';
+import { ClassDetail } from '../models/class-detail.model';
 import { Class } from '../models/class.model';
 
 export abstract class IClassesRepository {
@@ -57,6 +58,15 @@ export abstract class IClassesRepository {
     scheduleId: string,
   ): Promise<string[]>;
   public abstract getActiveIdsByStudentId(studentId: string): Promise<string[]>;
+  public abstract getDetailById(
+    classId: string,
+    organizationId: string,
+  ): Promise<ClassDetail>;
+  public abstract getByStudentId(
+    studentId: string,
+    organizationId: string,
+    pagination: PaginationQueryDTO,
+  ): Promise<PaginatedResponse<ClassDetail>>;
   public abstract countActiveByOrganizationId(
     organizationId: string,
   ): Promise<number>;

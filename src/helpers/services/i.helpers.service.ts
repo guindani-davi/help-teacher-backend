@@ -10,6 +10,7 @@ export abstract class IHelpersService {
   ): { createdAtDate: Date; updatedAtDate: Date | null };
   public abstract parseDate(date: string): Date;
   public abstract subtractOneDay(date: string): string;
+  public abstract getCurrentDate(): string;
   public abstract isProduction(): boolean;
   public abstract generateSlug(name: string): string;
 }

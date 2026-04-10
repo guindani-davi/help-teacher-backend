@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { II18nService } from 'src/i18n/services/i.i18n.service';
 import type { LocaleEnum } from '../../i18n/enums/locale.enum';
+import { II18nService } from '../../i18n/services/i.i18n.service';
 
 @Injectable()
 export abstract class IEmailService {

@@ -14,9 +14,9 @@ import { CurrentMembership } from '../../../auth/decorators/current-membership.d
 import { CurrentUser } from '../../../auth/decorators/current-user.decorator';
 import { AllowedRoles } from '../../../auth/decorators/roles.decorator';
 import { RolesEnum } from '../../../auth/enums/roles.enum';
-import { MembershipGuard } from '../../../auth/guards/membership.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import type { JwtPayload } from '../../../auth/models/jwt.model';
+import { MembershipGuard } from '../../../memberships/guards/membership.guard';
 import type { Membership } from '../../../memberships/models/membership.model';
 import { ActiveSubscriptionGuard } from '../../../subscriptions/guards/active-subscription.guard';
 import { CreateClassTopicBodyDTO } from '../../dtos/create-class-topic.dto';

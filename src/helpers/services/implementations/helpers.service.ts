@@ -33,6 +33,10 @@ export class HelpersService extends IHelpersService {
     return d.toISOString().split('T')[0] as string;
   }
 
+  public getCurrentDate(): string {
+    return new Date().toISOString().split('T')[0] as string;
+  }
+
   public isProduction(): boolean {
     const nodeEnv = this.configService.getOrThrow<NodeEnvironment>('NODE_ENV');
     return nodeEnv === NodeEnvironment.PRODUCTION;

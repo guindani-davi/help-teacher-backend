@@ -46,4 +46,5 @@ export abstract class IOrganizationsRepository {
     logoUrl: string,
     userId: string,
   ): Promise<Organization>;
+  public abstract countActiveByOwner(userId: string): Promise<number>;
 }

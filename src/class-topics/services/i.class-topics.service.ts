@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { IClassesService } from 'src/classes/services/i.classes.service';
-import { IReportCacheService } from 'src/reports/services/i.report-cache.service';
-import { ITopicsService } from 'src/topics/services/i.topics.service';
 import type { JwtPayload } from '../../auth/models/jwt.model';
+import { IClassesService } from '../../classes/services/i.classes.service';
 import type { Membership } from '../../memberships/models/membership.model';
+import { IReportCacheService } from '../../reports/services/i.report-cache.service';
+import { ITopicsService } from '../../topics/services/i.topics.service';
 import { CreateClassTopicBodyDTO } from '../dtos/create-class-topic.dto';
 import { DeleteClassTopicParamsDTO } from '../dtos/delete-class-topic.dto';
 import { ClassTopicDetail } from '../models/class-topic-detail.model';

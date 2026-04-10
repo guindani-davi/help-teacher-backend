@@ -3,6 +3,7 @@ import type { JwtPayload } from '../../auth/models/jwt.model';
 import { IHelpersService } from '../../helpers/services/i.helpers.service';
 import { IReportCacheService } from '../../reports/services/i.report-cache.service';
 import { IStorageService } from '../../storage/services/i.storage.service';
+import { ISubscriptionsService } from '../../subscriptions/services/i.subscriptions.service';
 import { CreateOrganizationBodyDTO } from '../dtos/create-organization.dto';
 import { DeleteOrganizationParamsDTO } from '../dtos/delete-organization.dto';
 import { GetOrganizationBySlugParamsDTO } from '../dtos/get-organization.dto';
@@ -19,17 +20,20 @@ export abstract class IOrganizationsService {
   protected readonly helperService: IHelpersService;
   protected readonly storageService: IStorageService;
   protected readonly reportCacheService: IReportCacheService;
+  protected readonly subscriptionsService: ISubscriptionsService;
 
   public constructor(
     organizationsRepository: IOrganizationsRepository,
     helperService: IHelpersService,
     storageService: IStorageService,
     reportCacheService: IReportCacheService,
+    subscriptionsService: ISubscriptionsService,
   ) {
     this.organizationsRepository = organizationsRepository;
     this.helperService = helperService;
     this.storageService = storageService;
     this.reportCacheService = reportCacheService;
+    this.subscriptionsService = subscriptionsService;
   }
 
   public abstract createOrganization(

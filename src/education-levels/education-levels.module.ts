@@ -3,6 +3,7 @@ import { AuthModule } from '../auth/auth.module';
 import { DatabaseModule } from '../database/database.module';
 import { GradeLevelsModule } from '../grade-levels/grade-levels.module';
 import { HelpersModule } from '../helpers/helpers.module';
+import { MembershipsModule } from '../memberships/memberships.module';
 import { RegistrationsModule } from '../registrations/registrations.module';
 import { ReportsModule } from '../reports/reports.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
@@ -18,6 +19,7 @@ import { EducationLevelsService } from './services/implementations/education-lev
     DatabaseModule,
     HelpersModule,
     forwardRef(() => AuthModule),
+    forwardRef(() => MembershipsModule),
     forwardRef(() => SubscriptionsModule),
     forwardRef(() => GradeLevelsModule),
     forwardRef(() => RegistrationsModule),

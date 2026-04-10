@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { StorageBucket } from 'src/storage/enums/storage-bucket.enum';
 import type { LocaleEnum } from '../../../i18n/enums/locale.enum';
+import { StorageBucket } from '../../../storage/enums/storage-bucket.enum';
 import { IStorageService } from '../../../storage/services/i.storage.service';
 import { IReportCacheService } from '../i.report-cache.service';
 
