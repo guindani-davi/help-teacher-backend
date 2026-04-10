@@ -1,0 +1,5 @@
+- update insomnia, cleanup geral não só das mudanças
+- pentest
+- documentação
+- pensar em como compartilhar coisas em comum entre front e back como estilos (pdf e email) (modelagem do domínio)
+- tentar vercel related projects com MCP Server

@@ -1,5 +1,5 @@
 import { createParamDecorator, type ExecutionContext } from '@nestjs/common';
-import type { Membership } from '../../organizations/model/membership.model';
+import type { Membership } from '../../memberships/models/membership.model';
 
 export const CurrentMembership = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): Membership => {

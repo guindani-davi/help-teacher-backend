@@ -1,0 +1,4 @@
+ALTER TABLE registrations ADD COLUMN start_date DATE NOT NULL DEFAULT CURRENT_DATE;
+ALTER TABLE registrations ADD COLUMN end_date DATE;
+
+ALTER TABLE registrations ALTER COLUMN start_date DROP DEFAULT;

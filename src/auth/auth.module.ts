@@ -1,17 +1,15 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import type { StringValue } from 'ms';
 import { DatabaseModule } from '../database/database.module';
 import { EmailModule } from '../email/email.module';
-import { OrganizationsModule } from '../organizations/organizations.module';
-import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { UsersModule } from '../users/users.module';
-import { AuthController } from './controller/implementation/auth.controller';
-import { AuthGuard } from './guards/jwt/jwt.guard';
-import { MembershipGuard } from './guards/membership/membership.guard';
-import { RolesGuard } from './guards/roles/roles.guard';
-import { IAuthService } from './service/i.auth.service';
-import { AuthService } from './service/implementation/auth.service';
+import { AuthController } from './controllers/implementations/auth.controller';
+import { AuthGuard } from './guards/jwt.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { IAuthService } from './services/i.auth.service';
+import { AuthService } from './services/implementations/auth.service';
 
 @Module({
   imports: [
@@ -19,14 +17,18 @@ import { AuthService } from './service/implementation/auth.service';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.getOrThrow<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '15m' },
+        signOptions: {
+          expiresIn: configService.getOrThrow<string>(
+            'JWT_DURATION',
+          ) as StringValue,
+          issuer: 'help-teacher',
+          audience: 'help-teacher-api',
+        },
       }),
     }),
     forwardRef(() => UsersModule),
     EmailModule,
     DatabaseModule,
-    forwardRef(() => OrganizationsModule),
-    forwardRef(() => SubscriptionsModule),
   ],
   providers: [
     {
@@ -34,10 +36,9 @@ import { AuthService } from './service/implementation/auth.service';
       useClass: AuthService,
     },
     AuthGuard,
-    MembershipGuard,
     RolesGuard,
   ],
   controllers: [AuthController],
-  exports: [JwtModule, IAuthService, AuthGuard, MembershipGuard, RolesGuard],
+  exports: [JwtModule, IAuthService, AuthGuard, RolesGuard],
 })
 export class AuthModule {}

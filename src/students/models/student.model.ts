@@ -1,0 +1,33 @@
+export class Student {
+  public readonly id: string;
+  public readonly name: string;
+  public readonly surname: string;
+  public readonly organizationId: string;
+  public readonly isActive: boolean;
+  public readonly createdBy: string;
+  public readonly updatedBy: string | null;
+  public readonly createdAt: Date;
+  public readonly updatedAt: Date | null;
+
+  public constructor(
+    id: string,
+    name: string,
+    surname: string,
+    organizationId: string,
+    isActive: boolean,
+    createdBy: string,
+    updatedBy: string | null,
+    createdAt: Date,
+    updatedAt: Date | null,
+  ) {
+    this.id = id;
+    this.name = name;
+    this.surname = surname;
+    this.organizationId = organizationId;
+    this.isActive = isActive;
+    this.createdBy = createdBy;
+    this.updatedBy = updatedBy;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+  }
+}

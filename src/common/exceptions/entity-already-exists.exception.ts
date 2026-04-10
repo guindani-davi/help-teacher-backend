@@ -6,6 +6,8 @@ export class EntityAlreadyExistsException extends DomainException {
     super(
       `${entity} already exists`,
       DomainExceptionCode.ENTITY_ALREADY_EXISTS,
+      'errors.entityAlreadyExists',
+      { entity },
     );
   }
 }

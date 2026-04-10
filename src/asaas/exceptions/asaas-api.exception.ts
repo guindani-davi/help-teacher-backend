@@ -6,6 +6,7 @@ export class AsaasApiException extends DomainException {
     super(
       'Payment processing failed. Please try again or contact support.',
       DomainExceptionCode.ASAAS_API_ERROR,
+      'errors.asaasApiError',
     );
 
     if (internalDetails) {

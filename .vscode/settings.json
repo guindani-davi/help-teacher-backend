@@ -3,9 +3,9 @@
     "source.organizeImports": "always",
   },
   "editor.formatOnSave": true,
-  "[typescript]": {
+  "[typescript]": { 
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "typescript.preferences.importModuleSpecifier": "relative",
+  "js/ts.preferences.importModuleSpecifier": "relative",
   "explorer.compactFolders": false
 }

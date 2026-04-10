@@ -4,16 +4,25 @@ import {
   type ExceptionFilter,
   HttpException,
   HttpStatus,
+  Inject,
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { LocaleEnum } from '../../i18n/enums/locale.enum';
+import { II18nService } from '../../i18n/services/i.i18n.service';
 import { DomainExceptionCode } from '../enums/domain-exception-code.enum';
 import { DomainException } from '../exceptions/domain.exception';
-import { ApiErrorResponse } from '../responses/api-error.response';
+import { ApiErrorResponse } from '../models/api-error.model';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  private readonly logger = new Logger(AllExceptionsFilter.name);
+  private readonly logger: Logger;
+  private readonly i18nService: II18nService;
+
+  public constructor(@Inject(II18nService) i18nService: II18nService) {
+    this.logger = new Logger(AllExceptionsFilter.name);
+    this.i18nService = i18nService;
+  }
 
   private static readonly DOMAIN_CODE_TO_STATUS = new Map<
     DomainExceptionCode,
@@ -30,32 +39,39 @@ export class AllExceptionsFilter implements ExceptionFilter {
     [DomainExceptionCode.INVITE_ALREADY_EXISTS, HttpStatus.CONFLICT],
     [DomainExceptionCode.INVITE_EXPIRED, HttpStatus.GONE],
     [DomainExceptionCode.INSUFFICIENT_SUBSCRIPTION, HttpStatus.FORBIDDEN],
-    [
-      DomainExceptionCode.ACTIVE_SUBSCRIPTION_REQUIRED,
-      HttpStatus.UNPROCESSABLE_ENTITY,
-    ],
-    [DomainExceptionCode.CANNOT_DOWNGRADE, HttpStatus.UNPROCESSABLE_ENTITY],
+    [DomainExceptionCode.SUBSCRIPTION_REQUIRED, HttpStatus.FORBIDDEN],
+    [DomainExceptionCode.SUBSCRIPTION_ALREADY_CANCELING, HttpStatus.CONFLICT],
+    [DomainExceptionCode.SUBSCRIPTION_NOT_CANCELING, HttpStatus.CONFLICT],
+    [DomainExceptionCode.SUBSCRIPTION_CANCEL_NOT_ALLOWED, HttpStatus.CONFLICT],
+    [DomainExceptionCode.SUBSCRIPTION_INVALID_STATE, HttpStatus.CONFLICT],
     [DomainExceptionCode.ASAAS_API_ERROR, HttpStatus.BAD_GATEWAY],
+    [DomainExceptionCode.REGISTRATION_OVERLAP, HttpStatus.CONFLICT],
+    [DomainExceptionCode.ORGANIZATION_LIMIT_REACHED, HttpStatus.FORBIDDEN],
   ]);
 
   public catch(exception: unknown, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<Response>();
     const request = host.switchToHttp().getRequest<Request>();
+    const locale = this.resolveLocale(request);
 
-    const { statusCode, errorResponse } = this.buildErrorResponse(exception);
+    const { statusCode, errorResponse } = this.buildErrorResponse(
+      exception,
+      locale,
+    );
 
-    this.logException(statusCode, errorResponse, request, exception);
+    this.logException(statusCode, request, exception);
 
     response.status(statusCode).json(errorResponse);
   }
 
   private logException(
     statusCode: number,
-    errorResponse: ApiErrorResponse,
     request: Request,
     exception: unknown,
   ): void {
-    const logMessage = `${statusCode} ${errorResponse.error} - ${errorResponse.message} | ${request.method} ${request.url}`;
+    const message =
+      exception instanceof Error ? exception.message : 'Unknown error';
+    const logMessage = `${statusCode} - ${message} | ${request.method} ${request.url}`;
 
     if (statusCode >= 500) {
       this.logger.error(logMessage);
@@ -68,22 +84,28 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
   }
 
-  private buildErrorResponse(exception: unknown): {
+  private buildErrorResponse(
+    exception: unknown,
+    locale: LocaleEnum,
+  ): {
     statusCode: number;
     errorResponse: ApiErrorResponse;
   } {
     if (exception instanceof DomainException) {
-      return this.handleDomainException(exception);
+      return this.handleDomainException(exception, locale);
     }
 
     if (exception instanceof HttpException) {
-      return this.handleHttpException(exception);
+      return this.handleHttpException(exception, locale);
     }
 
-    return this.handleUnknownException();
+    return this.handleUnknownException(locale);
   }
 
-  private handleDomainException(exception: DomainException): {
+  private handleDomainException(
+    exception: DomainException,
+    locale: LocaleEnum,
+  ): {
     statusCode: number;
     errorResponse: ApiErrorResponse;
   } {
@@ -91,13 +113,31 @@ export class AllExceptionsFilter implements ExceptionFilter {
       AllExceptionsFilter.DOMAIN_CODE_TO_STATUS.get(exception.code) ??
       HttpStatus.INTERNAL_SERVER_ERROR;
 
+    const translatedArgs = this.translateEntityArgs(
+      exception.messageArgs,
+      locale,
+    );
+
+    const translatedMessage = this.i18nService.t(
+      locale,
+      exception.messageKey,
+      translatedArgs,
+    );
+
     return {
       statusCode,
-      errorResponse: ApiErrorResponse.create(exception.code, exception.message),
+      errorResponse: ApiErrorResponse.create(
+        exception.code,
+        translatedMessage,
+        exception.details,
+      ),
     };
   }
 
-  private handleHttpException(exception: HttpException): {
+  private handleHttpException(
+    exception: HttpException,
+    locale: LocaleEnum,
+  ): {
     statusCode: number;
     errorResponse: ApiErrorResponse;
   } {
@@ -111,9 +151,23 @@ export class AllExceptionsFilter implements ExceptionFilter {
         statusCode,
         errorResponse: ApiErrorResponse.create(
           'VALIDATION_ERROR',
-          'One or more validation errors occurred',
+          this.i18nService.t(locale, 'errors.validationError'),
           details,
         ),
+      };
+    }
+
+    if (
+      typeof exceptionResponse === 'object' &&
+      'messageKey' in exceptionResponse
+    ) {
+      const { messageKey } = exceptionResponse as { messageKey: string };
+      const translatedMessage = this.i18nService.t(locale, messageKey);
+      const errorCode = this.statusToErrorCode(statusCode);
+
+      return {
+        statusCode,
+        errorResponse: ApiErrorResponse.create(errorCode, translatedMessage),
       };
     }
 
@@ -131,7 +185,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     };
   }
 
-  private handleUnknownException(): {
+  private handleUnknownException(locale: LocaleEnum): {
     statusCode: number;
     errorResponse: ApiErrorResponse;
   } {
@@ -139,9 +193,66 @@ export class AllExceptionsFilter implements ExceptionFilter {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       errorResponse: ApiErrorResponse.create(
         'INTERNAL_SERVER_ERROR',
-        'An unexpected error occurred',
+        this.i18nService.t(locale, 'errors.internalServerError'),
       ),
     };
+  }
+
+  private resolveLocale(request: Request): LocaleEnum {
+    const user = (request as unknown as Record<string, unknown>).user as
+      | { locale?: string }
+      | undefined;
+
+    if (
+      user?.locale &&
+      Object.values(LocaleEnum).includes(user.locale as LocaleEnum)
+    ) {
+      return user.locale as LocaleEnum;
+    }
+
+    const acceptLanguage = request.headers['accept-language'];
+
+    if (acceptLanguage) {
+      const requested = acceptLanguage.split(',')[0]?.trim();
+
+      if (requested) {
+        const match = Object.values(LocaleEnum).find(
+          (l) => l === requested || requested.startsWith(l),
+        );
+
+        if (match) return match;
+      }
+    }
+
+    return LocaleEnum.PT_BR;
+  }
+
+  private translateEntityArgs(
+    args: Record<string, string> | undefined,
+    locale: LocaleEnum,
+  ): Record<string, string> | undefined {
+    if (!args?.entity) return args;
+
+    const entityKey = this.entityNameToKey(args.entity);
+    const translatedEntity = this.i18nService.t(
+      locale,
+      `entities.${entityKey}`,
+    );
+
+    return { ...args, entity: translatedEntity };
+  }
+
+  private entityNameToKey(name: string): string {
+    return name
+      .replace(/-/g, ' ')
+      .split(' ')
+      .filter((word) => word.toLowerCase() !== 'link')
+      .map((word, i) =>
+        i === 0
+          ? word.toLowerCase()
+          : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+      )
+      .join('');
   }
 
   private isValidationError(response: string | object): boolean {

@@ -4,11 +4,11 @@ import { AuthModule } from '../auth/auth.module';
 import { DatabaseModule } from '../database/database.module';
 import { HelpersModule } from '../helpers/helpers.module';
 import { UsersModule } from '../users/users.module';
-import { SubscriptionsController } from './controller/implementation/subscriptions.controller';
-import { ISubscriptionsRepository } from './repository/i.subscriptions.repository';
-import { SubscriptionsRepository } from './repository/implementation/subscriptions.repository';
-import { ISubscriptionsService } from './service/i.subscriptions.service';
-import { SubscriptionsService } from './service/implementation/subscriptions.service';
+import { SubscriptionsController } from './controllers/implementations/subscriptions.controller';
+import { ISubscriptionsRepository } from './repositories/i.subscriptions.repository';
+import { SubscriptionsRepository } from './repositories/implementations/subscriptions.repository';
+import { ISubscriptionsService } from './services/i.subscriptions.service';
+import { SubscriptionsService } from './services/implementations/subscriptions.service';
 
 @Module({
   controllers: [SubscriptionsController],
@@ -17,7 +17,7 @@ import { SubscriptionsService } from './service/implementation/subscriptions.ser
     HelpersModule,
     forwardRef(() => AsaasModule),
     forwardRef(() => AuthModule),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   providers: [
     {
@@ -29,6 +29,6 @@ import { SubscriptionsService } from './service/implementation/subscriptions.ser
       useClass: SubscriptionsService,
     },
   ],
-  exports: [ISubscriptionsService, ISubscriptionsRepository],
+  exports: [ISubscriptionsService],
 })
 export class SubscriptionsModule {}
